@@ -17,7 +17,7 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str) -> tuple:
 
     if len(list_parts) < 3:
         errors.append(f"Faltan datos en {zone_type}, linea {line_num}")
-        return errors
+        return name, x, y, errors
     
     name = list_parts[0]
     if not isinstance(name, str):
