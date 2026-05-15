@@ -37,7 +37,7 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str) -> tuple:
         else:
             metadata = metadata[1:-1]
             metadata = metadata.split()
-            print(metadata)
+            # print(metadata)
             for data in metadata:
                 if '=' not in data:
                     errors.append(f"Metadata inválida: {data}, no contiene '=' linea {line_num}")
@@ -150,14 +150,29 @@ def open_document(args: str) -> None:
 
 
 
-
-
             if line.startswith('hub'):
                     try:
                         required['hub'] = True
-                    except:
-                        pass
+                        line_clean = line.split(': ', 1)[1].rstrip('\n')
+                        parts = line_clean.split(' ', 3)
+                        # print(parts)
+                        name, x, y, errs = validate_hubs(parts, line_docu, 'hub')
+                        if errs:
+                            errores.extend(errs)
+                        if name in zones_names:
+                            errores.append(f"Nombre de zona repetido: {name}, linea {line_docu}")
+                        else:
+                            zones_names.append(name)
+                        if (x, y) in posiciones_xy:
+                            errores.append(f"Posición repetida: ({x},{y}), linea {line_docu}")
+                        else:
+                            posiciones_xy.append((x, y))
 
+                        required['hub'] = True
+                        print(f"Hub válido, linea {line_docu}", parts)
+
+                    except:
+                        errores.append(f'hub no tiene formato válido (ej: hub: start 0 0 [color=green]), linea {line_docu}')
 
 
 
@@ -167,15 +182,39 @@ def open_document(args: str) -> None:
 
                 else:
                     try:
+                        line_clean = line.split(': ', 1)[1].rstrip('\n')
+                        parts = line_clean.split(' ', 3)
+                        # print(parts)
+                        name, x, y, errs = validate_hubs(parts, line_docu, 'end_hub')
+                        if errs:
+                            errores.extend(errs)
+                        if name in zones_names:
+                            errores.append(f"Nombre de zona repetido: {name}, linea {line_docu}")
+                        else:
+                            zones_names.append(name)
+                        if (x, y) in posiciones_xy:
+                            errores.append(f"Posición repetida: ({x},{y}), linea {line_docu}")
+                        else:
+                            posiciones_xy.append((x, y))
+
                         required['end_hub'] = True
+                        print(f"End hub válido, linea {line_docu}", parts)
+
                     except:
-                        pass
+                        errores.append(f'end_hub no tiene formato válido (ej: end_hub: start 0 0 [color=green]), linea {line_docu}')
+
+
+
+
+
+
 
 
 
             if line.startswith('connection'):
                     try:
-                        required['connection'] = True
+                        # required['connection'] = True
+                        pass
                     except:
                         pass
 
