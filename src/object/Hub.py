@@ -8,6 +8,7 @@ class Hub:
     y: int
     type: str
     max_drones: int
+    color: str
     names_dron: list
 
     def __post_init__(self) -> None:
