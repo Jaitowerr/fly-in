@@ -7,7 +7,7 @@ if __name__ == '__main__':
 		parsing.open_document(arguments[0])
 		print('Si impime esto es que va bien el parseo')
 		print(arguments[0])
-		from src import start
+		from src import start_program as start
 		# drones, hubs, conexion = start.program(arguments[0])
 		start.program(arguments[0])
 

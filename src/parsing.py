@@ -165,7 +165,7 @@ def open_document(args: str) -> None:
             if line.startswith('#') or line[0] == '\n':
                 continue
 
-            if line.startswith('nb_drones: '):
+            elif line.startswith('nb_drones: '):
                 if required['nb_drones']:
                     errores.append(
                         f'nb_drones aparece más de una vez, linea {line_docu}')
