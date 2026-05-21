@@ -95,7 +95,7 @@ def list_object(args: str) -> tuple:
 
     print(f'Total HUBS creado: {len(list_hub)}')
     for hub in list_hub:
-        print(f'  - Name: {list_hub[0].hub_name}, {list_hub[0].x}, {list_hub[0].y}, {list_hub[0].color}, {list_hub[0].zone}')
+        print(f'  - Name: {hub.hub_name}, {hub.x}, {hub.y}, {hub.color}, {hub.zone}')
     # return list_drones, list_hub
 
     print(f'Total CONEXIONES creadas: {len(list_connect)}')
