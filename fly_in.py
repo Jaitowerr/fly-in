@@ -9,7 +9,7 @@ if __name__ == '__main__':
         print(arguments[0])
         from src import start_program as start
         # drones, hubs, conexion = start.program(arguments[0])
-        list_drones, list_hub, list_connect = start.program(arguments[0])
+        list_drones, list_hub, list_connect = start.list_object(arguments[0])
         # print(list_drones)
         # print(list_hub)
         # print(list_connect)

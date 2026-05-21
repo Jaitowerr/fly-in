@@ -22,6 +22,7 @@ def return_hub(hub: list, zone_type: str = None) -> None:
         dict_hub['start'] = True
     if zone_type == 'end':
         dict_hub['end'] = True
+        
     
     print(dict_hub)
     #     line = line.split()
@@ -29,7 +30,7 @@ def return_hub(hub: list, zone_type: str = None) -> None:
 
     return dict_hub
 
-def program(args: str) -> tuple:
+def list_object(args: str) -> tuple:
 # def program(args: str) -> None:
     with open(args) as file:
         list_drones = []
@@ -80,7 +81,7 @@ def program(args: str) -> tuple:
                     if names2 == hub.hub_name:
                         dict_connect['destiny'] = hub
                 if len(parts) == 2:
-                    metadata = parts[1].split('=')[1]
+                    metadata = parts[1].split('=')[1][:1]
                     dict_connect['max_link_capacity'] = metadata
                 list_connect.append(Connection(**dict_connect))
 

@@ -159,6 +159,7 @@ def open_document(args: str) -> None:
     end_hub = str()
     blocked_zones = set()
     with open(args) as file:
+        nb = 0
         for line in file:
             line_docu += 1
 
@@ -286,6 +287,9 @@ def open_document(args: str) -> None:
                     if name1 not in zones_names or name2 not in zones_names:
                         errores.append(
                             f"Conexión inválida: uno o ambos nombres no existen ({name1}-{name2})")
+                    elif (name1, name2) in conexion or (name2, name1) in conexion:
+                        errores.append(
+                            f"Conexión inválida: No se peden repetir conexiones igualles ({name1}-{name2})")                        
                     else:
                         conexion.append((name1, name2))
                         conexion.append((name2, name1))

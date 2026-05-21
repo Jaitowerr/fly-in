@@ -13,7 +13,7 @@ class Hub:
     start: bool = False
     end: bool = False
     # names_dron: list
-    names_dron: List[str] = field(default_factory=list)
+    # names_dron: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         pass
