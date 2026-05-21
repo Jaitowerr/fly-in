@@ -35,6 +35,8 @@ def program(args: str) -> None:
         list_drones = []
         dict_hub = dict()
         list_hub = []
+        dict_connect = dict()
+        list_connect = []
         for line in file:
 
             if line.startswith('#') or line[0] == '\n':
@@ -69,15 +71,32 @@ def program(args: str) -> None:
 
             elif line.startswith('connection: '):
                 hub = line.split(': ', 1)[1].rstrip('\n')
-                hub = hub.split(' ', 3)
+                parts = hub.split(' ', 1)
+                names = parts[0]
+                names1, names2 = names.split('-')
+                for hub in list_hub:
+                    if names1 == hub.hub_name:
+                        dict_connect['origin'] = hub
+                    if names2 == hub.hub_name:
+                        dict_connect['destiny'] = hub
+                if len(parts) == 2:
+                    metadata = parts[1].split('=')[1]
+                    dict_connect['max_link_capacity'] = metadata
+                list_connect.append(Connection(**dict_connect))
+
+
+                    
 
     print('\n')
-    print(f"Total de drones creados: {len(list_drones)}")
+    print(f"Total de DRONES creados: {len(list_drones)}")
     for drone in list_drones:
         print(f'  - Drone ID: DR-{drone.id_dron}')
 
-    print(f'Total Hub start creado: {len(list_hub)}')
+    print(f'Total HUBS creado: {len(list_hub)}')
     for hub in list_hub:
         print(f'  - Name: {list_hub[0].hub_name}, {list_hub[0].x}, {list_hub[0].y}, {list_hub[0].color}, {list_hub[0].zone}')
     # return list_drones, list_hub
 
+    print(f'Total CONEXIONES creadas: {len(list_connect)}')
+    for conx in list_connect:
+        print(f'  - ', conx.origin.hub_name, conx.destiny.hub_name, conx.max_link_capacity)
