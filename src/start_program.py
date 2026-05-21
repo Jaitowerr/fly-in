@@ -2,7 +2,7 @@ from src.object.Dron import Dron
 from src.object.Hub import Hub
 from src.object.Connection import Connection
 
-def return_hub(hub: list, zone_type: str = '') -> None:
+def return_hub(hub: list, zone_type: str = None) -> None:
     dict_hub = dict()
     name = hub.pop(0)
     dict_hub['hub_name'] = name
@@ -20,8 +20,8 @@ def return_hub(hub: list, zone_type: str = '') -> None:
             dict_hub[key] = value
     if zone_type == 'start':
         dict_hub['start'] = True
-    elif zone_type == 'end':
-        dict_hub['end'] == True
+    if zone_type == 'end':
+        dict_hub['end'] = True
     
     print(dict_hub)
     #     line = line.split()
@@ -42,15 +42,18 @@ def program(args: str) -> None:
 
             elif line.startswith('nb_drones: '):
                 nb = int(line.split(': ', 1)[1])
-                for i in range(nb):
+                for i in range(1, nb + 1):
                     list_drones.append(Dron(i))
     
             elif line.startswith('start_hub: '):
                 hub = line.split(': ', 1)[1].rstrip('\n')
                 hub = hub.split(' ', 3)
-                dict_hub = return_hub(hub, 'start_hub')
+                dict_hub = return_hub(hub, 'start')
                 list_hub.append(Hub(**dict_hub))
-
+                for dron in list_drones:
+                    for hub in list_hub:
+                        dron.posicion_actual = hub.hub_name
+                    dron.print_dron()  # printea los drones y su contenido eliminar tras fin programa
 
             elif line.startswith('hub: '):
                 hub = line.split(': ', 1)[1].rstrip('\n')
@@ -59,15 +62,22 @@ def program(args: str) -> None:
                 list_hub.append(Hub(**dict_hub))
 
             elif line.startswith('end_hub: '):
-                pass
+                hub = line.split(': ', 1)[1].rstrip('\n')
+                hub = hub.split(' ', 3)
+                dict_hub = return_hub(hub, 'end')
+                list_hub.append(Hub(**dict_hub))
 
+            elif line.startswith('connection: '):
+                hub = line.split(': ', 1)[1].rstrip('\n')
+                hub = hub.split(' ', 3)
 
-
+    print('\n')
     print(f"Total de drones creados: {len(list_drones)}")
     for drone in list_drones:
-        print(f'Drone ID: {drone.id_dron}')
+        print(f'  - Drone ID: DR-{drone.id_dron}')
 
     print(f'Total Hub start creado: {len(list_hub)}')
-    print(f'Name: {list_hub[0].hub_name}, {list_hub[0].x}, {list_hub[0].y}, {list_hub[0].color}, {list_hub[0].zone}')
+    for hub in list_hub:
+        print(f'  - Name: {list_hub[0].hub_name}, {list_hub[0].x}, {list_hub[0].y}, {list_hub[0].color}, {list_hub[0].zone}')
     # return list_drones, list_hub
 
