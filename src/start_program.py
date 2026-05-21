@@ -29,8 +29,8 @@ def return_hub(hub: list, zone_type: str = None) -> None:
 
     return dict_hub
 
-# def program(args: str) -> tuple:
-def program(args: str) -> None:
+def program(args: str) -> tuple:
+# def program(args: str) -> None:
     with open(args) as file:
         list_drones = []
         dict_hub = dict()
@@ -100,3 +100,5 @@ def program(args: str) -> None:
     print(f'Total CONEXIONES creadas: {len(list_connect)}')
     for conx in list_connect:
         print(f'  - ', conx.origin.hub_name, conx.destiny.hub_name, conx.max_link_capacity)
+
+    return list_drones, list_hub, list_connect
