@@ -2,6 +2,7 @@ from src.object.Dron import Dron
 from src.object.Hub import Hub
 from src.object.Connection import Connection
 
+
 def return_hub(hub: list, zone_type: str = None) -> None:
     dict_hub = dict()
     name = hub.pop(0)
@@ -22,16 +23,15 @@ def return_hub(hub: list, zone_type: str = None) -> None:
         dict_hub['start'] = True
     if zone_type == 'end':
         dict_hub['end'] = True
-        
-    
+
     print(dict_hub)
     #     line = line.split()
 
-
     return dict_hub
 
+
 def list_object(args: str) -> tuple:
-# def program(args: str) -> None:
+    # def program(args: str) -> None:
     with open(args) as file:
         list_drones = []
         dict_hub = dict()
@@ -47,7 +47,7 @@ def list_object(args: str) -> tuple:
                 nb = int(line.split(': ', 1)[1])
                 for i in range(1, nb + 1):
                     list_drones.append(Dron(i))
-    
+
             elif line.startswith('start_hub: '):
                 hub = line.split(': ', 1)[1].rstrip('\n')
                 hub = hub.split(' ', 3)
@@ -85,9 +85,6 @@ def list_object(args: str) -> tuple:
                     dict_connect['max_link_capacity'] = metadata
                 list_connect.append(Connection(**dict_connect))
 
-
-                    
-
     print('\n')
     print(f"Total de DRONES creados: {len(list_drones)}")
     for drone in list_drones:
@@ -95,11 +92,13 @@ def list_object(args: str) -> tuple:
 
     print(f'Total HUBS creado: {len(list_hub)}')
     for hub in list_hub:
-        print(f'  - Name: {hub.hub_name}, {hub.x}, {hub.y}, {hub.color}, {hub.zone}')
+        print(
+            f'  - Name: {hub.hub_name}, {hub.x}, {hub.y}, {hub.color}, {hub.zone}')
     # return list_drones, list_hub
 
     print(f'Total CONEXIONES creadas: {len(list_connect)}')
     for conx in list_connect:
-        print(f'  - ', conx.origin.hub_name, conx.destiny.hub_name, conx.max_link_capacity)
+        print(f'  - ', conx.origin.hub_name,
+              conx.destiny.hub_name, conx.max_link_capacity)
 
     return list_drones, list_hub, list_connect
