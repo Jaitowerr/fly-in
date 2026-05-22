@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from typing import List
-
+from typing import List, Any
+# from .Dron import Dron
 
 @dataclass
 class Hub:
@@ -12,7 +12,7 @@ class Hub:
     max_drones: int = 1
     start: bool = False
     end: bool = False
-    # names_dron: list
+    ocupado_drones: list[Any] = None
     # names_dron: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
