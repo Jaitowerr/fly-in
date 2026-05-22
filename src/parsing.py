@@ -14,7 +14,8 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
     metadata = None
     zone_types = ['normal', 'blocked', 'restricted', 'priority']
     colors = ['green', 'yellow', 'red', 'blue', 'gray', 'darked', 'gold', 'black', 'marron',
-              'orange', 'brown', 'purple', 'maroon', 'darkred', 'violet', 'crimson', 'rainbow']
+              'orange', 'brown', 'purple', 'maroon', 'darkred', 'violet', 'crimson', 'rainbow',
+              'cyan', 'lime', 'magenta']
 
     if len(list_parts) < 3:
         errors.append(f"Faltan datos en {zone_type}, linea {line_num}")
@@ -174,7 +175,7 @@ def open_document(args: str) -> None:
                 try:
                     nb = int(line.split(': ', 1)[1])
                     required['nb_drones'] = True
-                    print(f"Número de drones: {nb}")
+                    # print(f"Número de drones: {nb}")
                 except:
                     errores.append('Comprueba que sea <nb_drones: 5')
 
@@ -206,7 +207,7 @@ def open_document(args: str) -> None:
                             posiciones_xy.append((x, y))
 
                         required['start_hub'] = True
-                        print(f"Start hub válido, linea {line_docu}", parts)
+                        # print(f"Start hub válido, linea {line_docu}", parts)
 
                     except:
                         errores.append(
@@ -218,7 +219,8 @@ def open_document(args: str) -> None:
                     line_clean = line.split(': ', 1)[1].rstrip('\n')
                     parts = line_clean.split(' ', 3)
                     # print(parts)
-                    name, x, y, errs, blocked_zones = validate_hubs(parts, line_docu, 'hub', blocked_zones)
+                    name, x, y, errs, blocked_zones = validate_hubs(
+                        parts, line_docu, 'hub', blocked_zones)
                     if errs:
                         errores.extend(errs)
                     if name in zones_names:
@@ -233,7 +235,7 @@ def open_document(args: str) -> None:
                         posiciones_xy.append((x, y))
 
                     # required['hub'] = True
-                    print(f"Hub válido, linea {line_docu}", parts)
+                    # print(f"Hub válido, linea {line_docu}", parts)
 
                 except:
                     errores.append(
@@ -266,7 +268,7 @@ def open_document(args: str) -> None:
                             posiciones_xy.append((x, y))
 
                         required['end_hub'] = True
-                        print(f"End hub válido, linea {line_docu}", parts)
+                        # print(f"End hub válido, linea {line_docu}", parts)
 
                     except:
                         errores.append(
@@ -289,7 +291,7 @@ def open_document(args: str) -> None:
                             f"Conexión inválida: uno o ambos nombres no existen ({name1}-{name2})")
                     elif (name1, name2) in conexion or (name2, name1) in conexion:
                         errores.append(
-                            f"Conexión inválida: No se peden repetir conexiones igualles ({name1}-{name2})")                        
+                            f"Conexión inválida: No se peden repetir conexiones igualles ({name1}-{name2})")
                     else:
                         conexion.append((name1, name2))
                         conexion.append((name2, name1))
@@ -344,7 +346,7 @@ def open_document(args: str) -> None:
         errores.append(
             'Mapa sin salida: no se puede llegar desde start_hub hasta end_hub')
     else:
-        print('El mapa tiene camino a la SAlida')
+        print('El mapa tiene camino a la Salida, preparando drones, hubs y conexiones...')
 
     if errores:
         print('Errores:')
