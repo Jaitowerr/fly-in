@@ -1,7 +1,7 @@
 from src.object.Dron import Dron
 from src.object.Hub import Hub
 from src.object.Connection import Connection
-from src.algorithm import prioritized_planner as algo
+from src.algorithm import prioritized_planner as algorith
 
 
 def return_hub(hub: list, zone_type: str = None) -> None:
@@ -106,6 +106,8 @@ def list_object(args: str) -> tuple:
     return list_drones, list_hub, list_connect
 
 def todos_llegan(list_drones: list, list_hubs: Hub)-> bool:
+    '''COmpruebo que todos estén en end'''
+    
     bool_end = []
     
     for dron in list_drones:
@@ -129,6 +131,6 @@ def start_program(list_drones: Dron, list_hubs: Hub, list_connect:Connection)-> 
     while not todos_llegan(list_drones, list_hubs):
         turnos += 1
         print('Turno ::::  ', turnos)
-        algo.path(list_connect, list_drones[0])
+        algorith.path(list_connect, list_drones[0])
         break
 
