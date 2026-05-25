@@ -131,6 +131,6 @@ def start_program(list_drones: Dron, list_hubs: Hub, list_connect:Connection)-> 
     while not todos_llegan(list_drones, list_hubs):
         turnos += 1
         print('Turno ::::  ', turnos)
-        algorith.path(list_connect, list_drones[0])
+        algorith.path(list_connect)
         break
 
