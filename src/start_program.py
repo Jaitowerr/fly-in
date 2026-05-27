@@ -124,13 +124,20 @@ def start_program(list_drones: Dron, list_hubs: Hub, list_connect:Connection)-> 
         else:
             list_con_limpia.append(con)
     list_connect = list_con_limpia
+    
+    
     # print('Blocked = ', list_con_blocked)
     # print('List connect limpio = ', list_connect)
     # print(list_drones)
+    rutas = algorith.path(list_connect)
+    nb_drn = len(list_drones)
+
+
     turnos = 0
+    lista_dron_con_ruta = algorith.asignacion_mapa(rutas, list_drones)
+    # aqui vamos a devolver la lsita de drones, cada regresará con su ruta de conexiones guardada en Dron
     while not todos_llegan(list_drones, list_hubs):
         turnos += 1
         print('Turno ::::  ', turnos)
-        algorith.path(list_connect)
         break
 

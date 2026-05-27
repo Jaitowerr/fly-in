@@ -1,7 +1,7 @@
 from src.object.Connection import Connection
 from src.object.Hub import Hub
 from src.object.Dron import Dron
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 
 
 def print_rutas(rutas: List[List[Connection]]) -> None:
@@ -132,7 +132,7 @@ def ordenar_todas_rutas(todas_las_rutas: List[List[Connection]]) -> List[Tuple[i
 
 
 
-def path(list_connect: List[Connection])-> List[List[Connection]]:
+def path(list_connect: List[Connection])-> List[Tuple[int, Tuple[Connection, ...], int, int]]:
     """
     Busca todas las rutas posibles desde hubs marcados como start hasta hubs end.
 
@@ -147,4 +147,40 @@ def path(list_connect: List[Connection])-> List[List[Connection]]:
     todas_las_rutas = buscar_rutas_desde_inicio(list_connect)
     # print_rutas(todas_las_rutas)
     rutas_ordenadas = ordenar_todas_rutas(todas_las_rutas)
-    print_rutas_ordenadas(rutas_ordenadas)
+    # print_rutas_ordenadas(rutas_ordenadas)
+    # print(type(rutas_ordenadas))
+
+    return rutas_ordenadas
+
+def convertir_ruta_a_turnos(ruta: Tuple[Connection, ...]) -> List[List[Any]]:
+    """
+    Convierte una ruta (lista de conexiones) en una lista de acciones por turno.
+    Cada turno tiene 3 pasos:
+       - Normal: [hub_origen, conexion, hub_destino]
+       - Restringido: turno 1: [hub_origen, conexion], turno 2: [conexion, hub_destino]
+    """
+    turnos = []
+    for conexion in ruta:
+        origen = conexion.origin
+        destino = conexion.destiny
+        
+        if origen.zone == 'restricted':
+            turnos.apppend([origen, conexion])
+            turnos.append([conexion, destino])
+        else:
+            turnos.apppend([origen, conexion, destino])
+    
+    return turnos
+
+def asignacion_mapa(rutas_ordenadas: List[Tuple[int, Tuple[Connection, ...], int, int]], list_drones: List[Dron]):
+
+    drones_asignados = []
+    uso_hubs = {}
+    uso_conexiones = {}
+
+    acciones_por_turno = convertir_ruta_a_turnos(rutas_ordenadas)
+
+
+        
+
+    

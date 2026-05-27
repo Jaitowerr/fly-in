@@ -11,6 +11,7 @@ class Dron:
     hub: Optional[Hub] = None
     posicion_actual: str = None
     posicion_destino: str = None
+    ruta_posiciones = None
 
     def __post_init__(self) -> None:
         pass
