@@ -12,7 +12,8 @@ class Hub:
     max_drones: int = 1
     start: bool = False
     end: bool = False
-    ocupado_drones: list[Any] = None
+    # ocupado_drones: list[Any] = None
+    dron_en_hub = 0
     # names_dron: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
