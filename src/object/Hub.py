@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
-from typing import List, Any
-# from .Dron import Dron
+from dataclasses import dataclass
+
 
 @dataclass
 class Hub:
@@ -12,9 +11,4 @@ class Hub:
     max_drones: int = 1
     start: bool = False
     end: bool = False
-    # ocupado_drones: list[Any] = None
-    dron_en_hub = 0
-    # names_dron: List[str] = field(default_factory=list)
-
-    def __post_init__(self) -> None:
-        pass
+    drones_in_hub = 0

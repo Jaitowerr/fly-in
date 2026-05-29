@@ -1,7 +1,7 @@
 .PHONY: install run debug lint lint-strict clean
 
 ENTRY_SCRIPT ?= fly_in.py
-ARGS ?= 'prueba.txt'
+ARGS ?= $(filter-out $@,$(MAKECMDGOALS))
 
 run:
 	@ $(MAKE) clean

@@ -1,20 +1,15 @@
 
 from dataclasses import dataclass
 from .Hub import Hub
-from typing import Optional
+from typing import Optional, Any
+
 
 @dataclass
 class Dron:
-    id_dron: int
-    turnos_restantes: int = 0
-    # hub: Optional[Hub] = None
-    hub: Optional[Hub] = None
-    posicion_actual: str = None
-    posicion_destino: str = None
-    ruta_posiciones = None
 
-    def __post_init__(self) -> None:
-        pass
-    
-    # def print_dron(self):
-    #     print('  - ', self.id_dron, self.posicion_actual, self.posicion_destino, self.turnos_restantes)
+    drone_id: int
+    remaining_turns: int = 0
+    hub: Optional[Hub] = None
+    current_position: str = None
+    destination_position: str = None
+    route_positions: Any = None
