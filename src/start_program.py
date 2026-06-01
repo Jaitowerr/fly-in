@@ -120,7 +120,9 @@ def all_arrived(list_drones: list, list_hubs: Hub) -> bool:
     return all(statuses)
 
 
-def start_program(list_drones: Dron, list_hubs: Hub, list_connect: Connection) -> None:
+def start_program(list_drones: Dron,
+                  list_hubs: Hub,
+                  list_connect: Connection) -> None:
     """
     Main interactive routine that filters blocked connections, computes routes
     and allows the user to print the simulation in different modes.
@@ -167,4 +169,5 @@ def start_program(list_drones: Dron, list_hubs: Hub, list_connect: Connection) -
             break
 
         else:
-            print(f"{printp._RED}Invalid option. Press 1, 2 or q.{printp._RESET}")
+            print(f"{printp._RED}Invalid option. Press 1, 2 or q."
+                  f"{printp._RESET}")

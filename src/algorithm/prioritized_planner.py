@@ -27,14 +27,21 @@ def print_ordered_routes(ordered_paths: List[tuple]) -> None:
             [ruta[-1].destiny.hub_name]
         ruta_str = " -> ".join(nombres)
         print(
-            f"Route {i}: {turnos} turns, priority {prioridad}, repetitions: {repe}\n  {ruta_str}\n")
+            f'Route {i}: {turnos} turns, '
+            f'priority {prioridad}, '
+            f'repetitions: {repe}\n  {ruta_str}\n')
 
 
 def print_routes_finales(end_paths: List[List]) -> None:
     print('Routes length', len(end_paths))
 
 
-def explore_route(connection_actual: Connection, ruta_actual: List[Connection], list_connect: List[Connection], all_routes: List[List[Connection]]):
+def explore_route(
+    connection_actual: Connection,
+    ruta_actual: List[Connection],
+    list_connect: List[Connection],
+    all_routes: List[List[Connection]]
+):
     """Recursively explore a route starting from the current connection.
 
     This function collects all acyclic routes that end at a hub with the
@@ -67,7 +74,9 @@ def explore_route(connection_actual: Connection, ruta_actual: List[Connection], 
             explore_route(con, nueva_ruta, list_connect, all_routes)
 
 
-def find_routes_from_start(list_connect: List[Connection]) -> List[List[Connection]]:
+def find_routes_from_start(
+    list_connect: List[Connection]
+) -> List[List[Connection]]:
     """Find all acyclic routes starting at hubs marked as start.
 
     Args:
@@ -114,15 +123,15 @@ def count_repetitions(ruta: List[Connection]) -> int:
     return repetitions
 
 
-
-
-def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
+def sort_all_routes(
+    all_routes: List[List[Connection]]
+) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
     """Ordena rutas por:
        1. Menos repeticiones
        2. Luego por longitud (menor primero)
        3. Luego por prioridad (mayor primero)
     """
-    
+
     def calcular_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
         turns = 0
         priority = 0
@@ -153,95 +162,10 @@ def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple
     return metadata_list
 
 
-# def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
-#     """Ordena las rutas por repeticiones, prioridad y turnos."""
-    
-#     def calcular_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
-#         """Devuelve (turnos, prioridad, repeticiones)"""
-#         turns = 0
-#         priority = 0
-#         for con in ruta:
-#             turns += 1
-#             if con.origin.zone == 'restricted':
-#                 turns += 1
-#             elif con.origin.zone == 'priority':
-#                 priority += 1
-#         repetitions = count_repetitions(ruta)
-#         return turns, priority, repetitions
-
-#     # Paso 1: calcular todo el metadata
-#     complete_list = []
-#     for ruta in all_routes:
-#         turns, priority, repetitions = calcular_metadata(ruta)
-#         complete_list.append((turns, tuple(ruta), priority, repetitions))
-
-#     # Paso 2: agrupar por número de repeticiones
-#     grupos = {}
-#     for turns, ruta_tuple, priority, repetitions in complete_list:
-#         if repetitions not in grupos:
-#             grupos[repetitions] = []
-#         grupos[repetitions].append((turns, ruta_tuple, priority, repetitions))
-
-#     # Paso 3: ordenar cada grupo
-#     def orden_para_grupo(item):
-#         # Orden: prioridad DESC, turnos ASC
-#         _, _, priority, _ = item
-#         turns, _, _, _ = item
-#         return (-priority, turns)
-
-#     for repe in grupos:
-#         grupos[repe].sort(key=orden_para_grupo)
-
-#     # Paso 4: juntar todo en orden de repeticiones
-#     result = []
-#     for num_rep in sorted(grupos.keys()):
-#         result.extend(grupos[num_rep])
-
-#     return result
-
-# def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
-#     """Compute metadata for routes and return them ordered.
-
-#     For each route this function computes:
-#       - total turns (int)
-#       - total priority cells (int)
-#       - number of repeated connections
-
-#     Routes are grouped by repetition count and within each group sorted by
-#     priority descending and turns ascending.
-#     """
-#     complete_list = []
-#     for ruta in all_routes:
-#         turns = 0
-#         priority = 0
-#         for con in ruta:
-#             turns += 1
-#             if con.origin.zone == 'restricted':
-#                 turns += 1
-#             elif con.origin.zone == 'priority':
-#                 priority += 1
-#         repetitions = count_repetitions(ruta)
-#         complete_list.append((turns, tuple(ruta), priority, repetitions))
-
-#     grupos = {}
-#     for ruta_datos in complete_list:
-#         _, _, _, repetitions = ruta_datos
-#         if repetitions not in grupos:
-#             grupos[repetitions] = []
-#         grupos[repetitions].append(ruta_datos)
-
-#     for repe in grupos:
-#         grupos[repe].sort(key=lambda x: (-x[2], x[0]))
-
-#     result = []
-#     for num_rep in sorted(grupos.keys()):
-#         result.extend(grupos[num_rep])
-
-#     return result
-
-
 def path(list_connect: List[Connection]) -> List[List[Connection]]:
-    """Find all possible routes from hubs marked as start to hubs marked as end.
+    """Find all possible routes from hubs marked as start to hubs marked
+    as end.
+
 
     Args:
         list_connect: Full list of Connection objects between hubs.
@@ -265,38 +189,43 @@ def _is_hub(obj) -> bool:
     return hasattr(obj, "hub_name")
 
 
+def _route_by_turns(conns: List[Any]) -> List[List[List[Any]]]:
+    """Convert a list of connections into per-turn steps."""
+    turnos: List[List[List[Any]]] = []
+    for connection in conns:
+        origin = connection.origin
+        destination = connection.destiny
+        if getattr(destination, "zone", None) == "restricted":
+            turno1 = [[origin, connection], [connection]]
+            turno2 = [[connection, connection], [destination]]
+            turnos.append(turno1)
+            turnos.append(turno2)
+        else:
+            turno = [[origin, connection], [destination]]
+            turnos.append(turno)
+    return turnos
+
+
 def expand_routes(rutas_input: List[Any]) -> List[List[List[List[Any]]]]:
     """Expand routes into per-turn steps.
 
     Accepts routes in either of the following formats:
       - List[List[Connection]]  (route as a list of Connection)
-      - List[Tuple[int, Tuple[Connection,...], int, int]]  (route with metadata)
+      - List[Tuple[int, Tuple[Connection,...], int, int]]  (route with
+        metadata)
 
     Returns:
         A list of route_turns where each route_turns = [turn1, turn2, ...] and
         each turn = [step1, step2] with step1 and step2 lists as specified.
     """
-
-    def route_by_turns(conns: List[Any]) -> List[List[List[Any]]]:
-        turnos: List[List[List[Any]]] = []
-        for connection in conns:
-            origin = connection.origin
-            destination = connection.destiny
-            if getattr(destination, "zone", None) == "restricted":
-                # restricted -> two turns
-                turno1 = [[origin, connection], [connection]]
-                turno2 = [[connection, connection], [destination]]
-                turnos.append(turno1)
-                turnos.append(turno2)
-            else:
-                turno = [[origin, connection], [destination]]
-                turnos.append(turno)
-        return turnos
-
     broken_out_routes: List[List[List[List[Any]]]] = []
     for ruta in rutas_input:
         route_conns = None
-        if isinstance(ruta, (list, tuple)) and len(ruta) >= 2 and isinstance(ruta[1], (list, tuple)):
+        if (
+            isinstance(ruta, (list, tuple))
+            and len(ruta) >= 2
+            and isinstance(ruta[1], (list, tuple))
+        ):
             route_conns = list(ruta[1])
         elif isinstance(ruta, list) and ruta and _is_connection(ruta[0]):
             route_conns = ruta
@@ -311,28 +240,50 @@ def expand_routes(rutas_input: List[Any]) -> List[List[List[List[Any]]]]:
         if not route_conns:
             continue
 
-        broken_out_routes.append(route_by_turns(route_conns))
+        broken_out_routes.append(_route_by_turns(route_conns))
 
     return broken_out_routes
+
+
+def _extract_connection(paso1):
+    """Extract the first Connection object from a step list."""
+    if isinstance(paso1, (list, tuple)):
+        for obj in paso1:
+            if _is_connection(obj):
+                return obj
+    return None
+
+
+def _extract_destination(paso2):
+    """Extract the first hub object from a step list."""
+    if isinstance(paso2, (list, tuple)) and paso2:
+        for obj in paso2:
+            if _is_hub(obj):
+                return obj
+    return None
 
 
 def check_and_generate_plan(shift_route: List[List[List[Any]]],
                             start_shift: int,
                             uso_hubs: dict,
                             connections_use: dict,
-                            max_turns_search: int = 1000) -> Tuple[bool, List[Any]]:
-    """Check whether a route (in per-turn form) can be placed starting at a given turn.
+                            max_turns_search: int = 1000
+                            ) -> Tuple[bool, List[Any]]:
+    """Check whether a route (in per-turn form) can be placed starting at
+    a given turn.
 
     Args:
         shift_route: Route represented as a list of turns.
         start_shift: The earliest turn index to try placing the route.
         uso_hubs: Dictionary tracking hub occupancy per (hub_name, turn).
-        connections_use: Dictionary tracking connection occupancy per ((origin,dest), turn).
+        connections_use: Dictionary tracking connection occupancy per
+            ((origin,dest), turn).
         max_turns_search: Maximum allowed timeline length for search.
 
     Returns:
-        A tuple (valid, plan) where valid is True if placement is possible and plan
-        is the list containing None placeholders up to start_shift followed by the turns.
+        A tuple (valid, plan) where valid is True if placement is possible
+        and plan is the list containing None placeholders up to start_shift
+        followed by the turns.
     """
     def get_val(d, k, default=0):
         return d.get(k, default)
@@ -349,13 +300,7 @@ def check_and_generate_plan(shift_route: List[List[List[Any]]],
         paso1, paso2 = turno
         real_shift = start_shift + i
 
-        connection = None
-        if isinstance(paso1, (list, tuple)):
-            for obj in paso1:
-                if _is_connection(obj):
-                    connection = obj
-                    break
-
+        connection = _extract_connection(paso1)
         if connection is not None:
             key_con = (
                 getattr(connection.origin, "hub_name", None),
@@ -365,13 +310,7 @@ def check_and_generate_plan(shift_route: List[List[List[Any]]],
             if get_val(connections_use, (key_con, real_shift), 0) >= max_link:
                 return False, []
 
-        destination = None
-        if isinstance(paso2, (list, tuple)) and paso2:
-            for obj in paso2:
-                if _is_hub(obj):
-                    destination = obj
-                    break
-
+        destination = _extract_destination(paso2)
         if destination is not None:
             dest_name = getattr(destination, "hub_name", None)
             if dest_name != "start":
@@ -390,20 +329,14 @@ def register_usage(shift_route: List[List[List[Any]]],
                    connections_use: dict) -> None:
     """Register precise per-turn occupancies so overlaps are tracked correctly.
 
-    This function increments counters in `uso_hubs` and `connections_use` for each
-    occupied hub or connection at the corresponding turn.
+    This function increments counters in `uso_hubs` and `connections_use`
+    for each occupied hub or connection at the corresponding turn.
     """
     for i, turno in enumerate(shift_route):
         paso1, paso2 = turno
         real_shift = start_shift + i
 
-        connection = None
-        if isinstance(paso1, (list, tuple)):
-            for obj in paso1:
-                if _is_connection(obj):
-                    connection = obj
-                    break
-
+        connection = _extract_connection(paso1)
         if connection is not None:
             key_con = (
                 getattr(connection.origin, "hub_name", None),
@@ -412,13 +345,7 @@ def register_usage(shift_route: List[List[List[Any]]],
             connections_use[(key_con, real_shift)] = connections_use.get(
                 (key_con, real_shift), 0) + 1
 
-        destination = None
-        if isinstance(paso2, (list, tuple)) and paso2:
-            for obj in paso2:
-                if _is_hub(obj):
-                    destination = obj
-                    break
-
+        destination = _extract_destination(paso2)
         if destination is not None:
             dest_name = getattr(destination, "hub_name", None)
             if dest_name != "start":
@@ -427,9 +354,11 @@ def register_usage(shift_route: List[List[List[Any]]],
 
 
 def assign_map(ordered_paths: List[Any], list_drones: List[Any]) -> List[Any]:
-    """Assign the best possible route to each drone respecting per-turn occupancies.
+    """Assign the best possible route to each drone respecting per-turn
+    occupancies.
 
-    The algorithm tries all routes for each drone starting at turn 0, then 1, etc.
+    The algorithm tries all routes for each drone starting at turn 0,
+    then 1, etc.
 
     Args:
         ordered_paths: Ordered list of routes (or routes with metadata).
@@ -457,8 +386,9 @@ def assign_map(ordered_paths: List[Any], list_drones: List[Any]) -> List[Any]:
                 )
                 if valido:
                     dron.route_positions = plan
-                    register_usage(shift_route, start_shift,
-                                   uso_hubs, connections_use)
+                    register_usage(
+                        shift_route, start_shift, uso_hubs, connections_use
+                    )
                     assigned_drones.append(dron)
                     assigned = True
                     break

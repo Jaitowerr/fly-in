@@ -2,7 +2,8 @@ from typing import Any
 import sys
 
 
-def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list: set) -> tuple:
+def validate_hubs(list_parts: list, line_num: int, zone_type: str,
+                  blocked_list: set) -> tuple:
     """
     Validate hub/token data parsed from a config line.
 
@@ -16,9 +17,11 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
     y = None
     metadata = None
     zone_types = ['normal', 'blocked', 'restricted', 'priority']
-    colors = ['green', 'yellow', 'red', 'blue', 'gray', 'darked', 'gold', 'black', 'marron',
-              'orange', 'brown', 'purple', 'maroon', 'darkred', 'violet', 'crimson', 'rainbow',
-              'cyan', 'lime', 'magenta']
+    colors = [
+        'green', 'yellow', 'red', 'blue', 'gray', 'darked', 'gold', 'black',
+        'marron', 'orange', 'brown', 'purple', 'maroon', 'darkred', 'violet',
+        'crimson', 'rainbow', 'cyan', 'lime', 'magenta'
+    ]
 
     if len(list_parts) < 3:
         errors.append(f"Missing data for {zone_type}, line {line_num}")
@@ -30,7 +33,8 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
     else:
         if '-' in name:
             errors.append(
-                f"Zone name must not contain hyphen '-': {name}, line {line_num}")
+                f"Zone name must not contain hyphen '-': {name}, line "
+                f"{line_num}")
 
     try:
         x = int(list_parts[1])
@@ -51,7 +55,8 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
             for data in metadata:
                 if '=' not in data:
                     errors.append(
-                        f"Invalid metadata: {data}, missing '=' line {line_num}")
+                        f"Invalid metadata: {data}, missing '=' line "
+                        f"{line_num}")
                     continue
 
                 key, val = data.split('=', 1)
@@ -66,14 +71,16 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
                         int(val)
                     except Exception:
                         errors.append(
-                            f"max_drones must be an integer: {val}, line {line_num}")
+                            f"max_drones must be an integer: {val}, "
+                            f"line {line_num}")
 
                 elif key == 'max_link_capacity':
                     try:
                         int(val)
                     except Exception:
                         errors.append(
-                            f"max_link_capacity must be an integer: {val}, line {line_num}")
+                            f"max_link_capacity must be an integer: {val}, "
+                            f"line {line_num}")
 
                 elif key == 'zone':
                     if val not in zone_types:
@@ -83,7 +90,8 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str, blocked_list:
                         blocked_list.add(name)
                 else:
                     errors.append(
-                        f'Check metadata, invalid metadata item {data} on line {line_num}')
+                        f'Check metadata, invalid metadata item {data} '
+                        f'on line {line_num}')
 
     return name, x, y, errors, blocked_list
 
@@ -125,7 +133,7 @@ def validate_args(args: Any) -> bool:
 
     except Exception:
         errors.append(
-            f"Unknown error opening file; run: make run <file.txt>")
+            "Unknown error opening file; run: make run <file.txt>")
 
     if errors:
         print('Errors:')
@@ -136,11 +144,13 @@ def validate_args(args: Any) -> bool:
     return True
 
 
-def sin_salida(connections: list, start: str, end: str, blocked_list: set) -> bool:
+def sin_salida(connections: list, start: str, end: str,
+               blocked_list: set) -> bool:
     """
     Check whether there is a path from start to end avoiding blocked zones.
 
-    Returns True if there is NO path (i.e. map has no exit), False if a path exists.
+    Returns True if there is NO path (i.e. map has no exit), False if a path
+    exists.
     """
     if start in blocked_list or end in blocked_list:
         return True
@@ -168,7 +178,8 @@ def sin_salida(connections: list, start: str, end: str, blocked_list: set) -> bo
             return False
 
         for neighbor in grafo.get(node, []):
-            if neighbor not in visited and neighbor not in blocked_list:
+            if (neighbor not in visited and
+                    neighbor not in blocked_list):
                 to_visit.append(neighbor)
     return True
 
@@ -224,14 +235,16 @@ def open_document(args: str) -> None:
                             errors.extend(errs)
                         if name in zones_names:
                             errors.append(
-                                f"Duplicate zone name: {name}, line {line_num}")
+                                f"Duplicate zone name: {name}, line "
+                                f"{line_num}")
                         else:
                             zones_names.append(name)
                             start_hub = name
 
                         if (x, y) in positions_xy:
                             errors.append(
-                                f"Duplicate position: ({x},{y}), line {line_num}")
+                                f"Duplicate position: ({x},{y}), line "
+                                f"{line_num}")
                         else:
                             positions_xy.append((x, y))
 
@@ -239,7 +252,9 @@ def open_document(args: str) -> None:
 
                     except Exception:
                         errors.append(
-                            f'start_hub has invalid format (e.g. start_hub: start 0 0 [color=green]), line {line_num}')
+                            f'start_hub has invalid format '
+                            f'(e.g. start_hub: start 0 0 [color=green]), '
+                            f'line {line_num}')
 
             elif line.startswith('hub: '):
                 try:
@@ -263,7 +278,9 @@ def open_document(args: str) -> None:
 
                 except Exception:
                     errors.append(
-                        f'hub has invalid format (e.g. hub: start 0 0 [color=green]), line {line_num}')
+                        f'hub has invalid format '
+                        f'(e.g. hub: start 0 0 [color=green]), line '
+                        f'{line_num}')
 
             elif line.startswith('end_hub: '):
                 if required['end_hub']:
@@ -281,13 +298,15 @@ def open_document(args: str) -> None:
                             errors.extend(errs)
                         if name in zones_names:
                             errors.append(
-                                f"Duplicate zone name: {name}, line {line_num}")
+                                f"Duplicate zone name: {name}, line "
+                                f"{line_num}")
                         else:
                             zones_names.append(name)
                             end_hub = name
                         if (x, y) in positions_xy:
                             errors.append(
-                                f"Duplicate position: ({x},{y}), line {line_num}")
+                                f"Duplicate position: ({x},{y}), line "
+                                f"{line_num}")
                         else:
                             positions_xy.append((x, y))
 
@@ -295,7 +314,9 @@ def open_document(args: str) -> None:
 
                     except Exception:
                         errors.append(
-                            f'end_hub has invalid format (e.g. end_hub: start 0 0 [color=green]), line {line_num}')
+                            f'end_hub has invalid format '
+                            f'(e.g. end_hub: start 0 0 [color=green]), '
+                            f'line {line_num}')
 
             elif line.startswith('connection: '):
                 try:
@@ -309,33 +330,42 @@ def open_document(args: str) -> None:
                             "Invalid connection format, expected: name1-name2")
                     else:
                         name1, name2 = zone_pair.split('-', 1)
-                    if name1 not in zones_names or name2 not in zones_names:
-                        errors.append(
-                            f"Invalid connection: one or both names do not exist ({name1}-{name2})")
-                    elif (name1, name2) in connections or (name2, name1) in connections:
-                        errors.append(
-                            f"Invalid connection: duplicate connection ({name1}-{name2})")
-                    else:
-                        connections.append((name1, name2))
-                        connections.append((name2, name1))
+                        if (name1 not in zones_names or
+                                name2 not in zones_names):
+                            errors.append(
+                                f"Invalid connection: one or both names "
+                                f"do not exist ({name1}-{name2})")
+                        elif ((name1, name2) in connections or
+                              (name2, name1) in connections):
+                            errors.append(
+                                f"Invalid connection: duplicate connection "
+                                f"({name1}-{name2})")
+                        else:
+                            connections.append((name1, name2))
+                            connections.append((name2, name1))
 
                     if len(parts) == 2:
                         meta_str = parts[1]
-                        if not (meta_str.startswith('[') and meta_str.endswith(']')):
+                        if not (meta_str.startswith('[') and
+                                meta_str.endswith(']')):
                             errors.append(
-                                f"Metadata must be enclosed in [] brackets, line {line_num}")
+                                f"Metadata must be enclosed in [] brackets, "
+                                f"line {line_num}")
                         else:
                             meta_content = meta_str[1:-1]
                             if '=' not in meta_content:
                                 errors.append(
-                                    f"Invalid metadata: {meta_content}, missing '=', line {line_num}")
+                                    f"Invalid metadata: {meta_content}, "
+                                    f"missing '=', line {line_num}")
                             else:
                                 if meta_content:
                                     meta_content = meta_content.split()
                                     for item in meta_content:
                                         if '=' not in item:
                                             errors.append(
-                                                f"Invalid metadata: {item}, missing '=', line {line_num}")
+                                                f"Invalid metadata: {item}, "
+                                                f"missing '=', line "
+                                                f"{line_num}")
                                         else:
                                             key, val = item.split('=', 1)
                                             if key == 'max_link_capacity':
@@ -343,10 +373,15 @@ def open_document(args: str) -> None:
                                                     int(val)
                                                 except Exception:
                                                     errors.append(
-                                                        f"max_link_capacity must be integer: {val}, line {line_num}")
+                                                        f"max_link_capacity "
+                                                        f"must be integer: "
+                                                        f"{val}, "
+                                                        f"line {line_num}")
                                             else:
                                                 errors.append(
-                                                    f"Metadata key not allowed: {key}, line {line_num}")
+                                                    f"Metadata key not "
+                                                    f"allowed: {key}, "
+                                                    f"line {line_num}")
 
                     elif len(parts) > 2:
                         errors.append(
@@ -354,7 +389,8 @@ def open_document(args: str) -> None:
 
                 except Exception as e:
                     errors.append(
-                        f'Error processing connection, line {line_num}: {str(e)}')
+                        f'Error processing connection, line {line_num}: '
+                        f'{str(e)}')
 
             else:
                 errors.append(f'Invalid line: {line_num}')

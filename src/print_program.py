@@ -6,13 +6,14 @@ import os
 
 
 _ANSI: dict[str, str] = {
-    "green":   "\033[32m",   "yellow":  "\033[33m",  "red":     "\033[31m",
-    "blue":    "\033[34m",   "cyan":    "\033[36m",   "magenta": "\033[35m",
-    "white":   "\033[37m",   "purple":  "\033[35;1m", "orange":  "\033[38;5;208m",
-    "brown":   "\033[38;5;130m", "maroon": "\033[38;5;88m", "black": "\033[90m",
-    "gold":    "\033[33;1m", "violet":  "\033[35;1m", "crimson": "\033[31;1m",
-    "darkred": "\033[31m",   "rainbow": "\033[36;1m", "lime":    "\033[38;5;118m",
-    "gray":    "\033[38;5;244m", "marron":  "\033[38;5;88m", "darked":  "\033[38;5;52m",
+    "green": "\033[32m", "yellow": "\033[33m", "red": "\033[31m",
+    "blue": "\033[34m", "cyan": "\033[36m", "magenta": "\033[35m",
+    "white": "\033[37m", "purple": "\033[35;1m", "orange": "\033[38;5;208m",
+    "brown": "\033[38;5;130m", "maroon": "\033[38;5;88m", "black": "\033[90m",
+    "gold": "\033[33;1m", "violet":  "\033[35;1m", "crimson": "\033[31;1m",
+    "darkred": "\033[31m", "rainbow": "\033[36;1m", "lime": "\033[38;5;118m",
+    "gray": "\033[38;5;244m", "marron": "\033[38;5;88m",
+    "darked": "\033[38;5;52m",
 }
 
 _RESET = "\033[0m"
@@ -21,7 +22,12 @@ _CYAN = "\033[36m"
 _BOLD = "\033[1m"
 _RED = "\033[31m"
 
-_DESIGNS = [' ~╚¥╝~ ', ' ╠═▄▄═╣ ', ' ╠═¤¤═╣ ', ' ╠¤¤╣ ', ' ╠-¥-╣ ', ' ╠--▄▄--╣ ']
+_DESIGNS = [' ~╚¥╝~ ',
+            ' ╠═▄▄═╣ ',
+            ' ╠═¤¤═╣ ',
+            ' ╠¤¤╣ ',
+            ' ╠-¥-╣ ',
+            ' ╠--▄▄--╣ ']
 _design_cache: dict[int, str] = {}
 
 
@@ -53,18 +59,21 @@ def print_by_turns(list_drones: List[Any]) -> None:
     (hub name or connection). It sleeps briefly between turns.
 
     Args:
-        list_drones (List[Any]): List of drone objects with a route_positions attribute.
+        list_drones (List[Any]): List of drone objects with a route_positions
+        attribute.
     """
 
     drones_ordenados = sorted(list_drones, key=lambda d: d.drone_id)
 
     max_turnos = max(
-        (len(d.route_positions) for d in drones_ordenados if d.route_positions),
+        (len(d.route_positions) for d in drones_ordenados if
+         d.route_positions),
         default=0,
     )
 
     print(f"\n{_CYAN}{'═' * 52}{_RESET}")
-    print(f"{_CYAN}{_BOLD}  SIMULATION — {len(list_drones)} drones — {max_turnos} turns{_RESET}")
+    print(f"{_CYAN}{_BOLD}  SIMULATION — {len(list_drones)} drones — "
+          "{max_turnos} turns{_RESET}")
     print(f"{_CYAN}{'═' * 52}{_RESET}\n")
 
     start_hub = list_drones[0].hub  # all start at the same hub
@@ -120,7 +129,8 @@ def print_with_animation(list_drones: List[Any], list_hubs: List[Any]) -> None:
     """Mapa animado turno a turno. Cada dron se mueve en su eje x,y."""
 
     drones = sorted(list_drones, key=lambda d: d.drone_id)
-    max_turnos = max((len(d.route_positions) for d in drones if d.route_positions), default=0)
+    max_turnos = max((len(d.route_positions) for d in drones if
+                      d.route_positions), default=0)
 
     xs = [float(h.x) for h in list_hubs]
     ys = [float(h.y) for h in list_hubs]
@@ -141,7 +151,8 @@ def print_with_animation(list_drones: List[Any], list_hubs: List[Any]) -> None:
 
     pos: dict[int, tuple[float, float]] = {}
     for dron in drones:
-        hub = next((h for h in list_hubs if h.hub_name == dron.current_position), None)
+        hub = next((h for h in list_hubs if
+                    h.hub_name == dron.current_position), None)
         if hub:
             pos[dron.drone_id] = (float(hub.x), float(hub.y))
 
@@ -187,7 +198,8 @@ def print_with_animation(list_drones: List[Any], list_hubs: List[Any]) -> None:
             if turno is None:
                 continue
             _, paso2 = turno
-            obj = next((o for o in paso2 if _is_hub(o) or _is_connection(o)), None)
+            obj = next((o for o in paso2 if _is_hub(o) or _is_connection(o)),
+                       None)
             if obj is None:
                 continue
             if _is_hub(obj):
