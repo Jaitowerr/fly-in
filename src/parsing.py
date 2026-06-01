@@ -154,7 +154,7 @@ def sin_salida(connections: list, start: str, end: str,
     """
     if start in blocked_list or end in blocked_list:
         return True
-    grafo = {}
+    grafo: dict[str, list[str]] = {}
     for a, b in connections:
         if a not in grafo:
             grafo[a] = []
@@ -195,12 +195,12 @@ def open_document(args: str) -> None:
     required = {'nb_drones': False, 'start_hub': False,
                 'hub': False, 'end_hub': False, 'connection': False}
     line_num = 0
-    zones_names = []
-    positions_xy = []
-    connections = []
-    start_hub = str()
-    end_hub = str()
-    blocked_zones = set()
+    zones_names: list[str] = []
+    positions_xy: list[tuple[int, int]] = []
+    connections: list[tuple[str, str]] = []
+    start_hub: str = ''
+    end_hub: str = ''
+    blocked_zones: set[str] = set()
 
     with open(args) as file:
         for line in file:
@@ -352,7 +352,8 @@ def open_document(args: str) -> None:
                                 f"Metadata must be enclosed in [] brackets, "
                                 f"line {line_num}")
                         else:
-                            meta_content = meta_str[1:-1]
+                            from typing import Any
+                            meta_content: Any = meta_str[1:-1]
                             if '=' not in meta_content:
                                 errors.append(
                                     f"Invalid metadata: {meta_content}, "

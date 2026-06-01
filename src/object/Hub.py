@@ -6,7 +6,7 @@ class Hub:
     hub_name: str
     x: int
     y: int
-    color: str
+    color: str = ''
     zone: str = 'normal'
     max_drones: int = 1
     start: bool = False

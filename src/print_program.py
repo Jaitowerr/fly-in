@@ -1,6 +1,6 @@
 import time
 from random import choice as rmc
-from typing import List, Any
+from typing import List, Any, Sequence, Dict
 from src.algorithm.prioritized_planner import _is_connection, _is_hub
 import os
 
@@ -22,16 +22,18 @@ _CYAN = "\033[36m"
 _BOLD = "\033[1m"
 _RED = "\033[31m"
 
-_DESIGNS = [' ~╚¥╝~ ',
-            ' ╠═▄▄═╣ ',
-            ' ╠═¤¤═╣ ',
-            ' ╠¤¤╣ ',
-            ' ╠-¥-╣ ',
-            ' ╠--▄▄--╣ ']
-_design_cache: dict[int, str] = {}
+_DESIGNS: List[str] = [
+    ' ~╚¥╝~ ',
+    ' ╠═▄▄═╣ ',
+    ' ╠═¤¤═╣ ',
+    ' ╠¤¤╣ ',
+    ' ╠-¥-╣ ',
+    ' ╠--▄▄--╣ '
+]
+_design_cache: Dict[int, str] = {}
 
 
-def print_launch_drones(list_drones) -> None:
+def print_launch_drones(list_drones: Sequence[Any]) -> None:
     """
     Show a decorative launch banner for the given drones.
 

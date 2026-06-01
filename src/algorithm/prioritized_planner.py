@@ -1,5 +1,6 @@
 from src.object.Connection import Connection
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Optional, Dict, Any as TAny, cast
+from src.object.Hub import Hub
 
 
 def print_routes(rutas: List[List[Connection]]) -> None:
@@ -41,7 +42,7 @@ def explore_route(
     ruta_actual: List[Connection],
     list_connect: List[Connection],
     all_routes: List[List[Connection]]
-):
+) -> None:
     """Recursively explore a route starting from the current connection.
 
     This function collects all acyclic routes that end at a hub with the
@@ -60,7 +61,7 @@ def explore_route(
         all_routes.append(ruta_actual)
         return
 
-    conteo_hubs = {}
+    conteo_hubs: Dict[str, int] = {}
     for c in ruta_actual:
         nombre = c.origin.hub_name
         conteo_hubs[nombre] = conteo_hubs.get(nombre, 0) + 1
@@ -86,8 +87,8 @@ def find_routes_from_start(
         A list of routes where each route is a list of Connection objects and
         ends at a hub where ``end`` is True.
     """
-    all_routes = []
-    home_connections = []
+    all_routes: List[List[Connection]] = []
+    home_connections: List[Connection] = []
 
     for con in list_connect:
         if con.origin.start:
@@ -108,7 +109,7 @@ def count_repetitions(ruta: List[Connection]) -> int:
     Returns:
         The number of repeated traversals (connections visited more than once).
     """
-    counter = {}
+    counter: Dict[Tuple[str, str], int] = {}
     for con in ruta:
         clave = (con.origin.hub_name, con.destiny.hub_name)
         if clave in counter:
@@ -145,13 +146,15 @@ def sort_all_routes(
         return turns, priority, repetitions
 
     # Calcular metadata
-    metadata_list = []
+    metadata_list: List[Tuple[int, Tuple[Connection, ...], int, int]] = []
     for ruta in all_routes:
         turns, priority, repetitions = calcular_metadata(ruta)
         metadata_list.append((turns, tuple(ruta), priority, repetitions))
 
     # Función de ordenación
-    def criterio_orden(item):
+    def criterio_orden(
+        item: Tuple[int, Tuple[Connection, ...], int, int]
+    ) -> Tuple[int, int, int]:
         turns, _, priority, repetitions = item
         # Orden: (repeticiones ASC, largo ASC, prioridad DESC)
         return (repetitions, turns, -priority)
@@ -176,16 +179,18 @@ def path(list_connect: List[Connection]) -> List[List[Connection]]:
 
     all_routes = find_routes_from_start(list_connect)
     ordered_paths = sort_all_routes(all_routes)
-    end_paths = [list(ruta) for _, ruta, _, _ in ordered_paths]
+    end_paths: List[List[Connection]] = [
+        list(ruta) for _, ruta, _, _ in ordered_paths
+    ]
 
     return end_paths
 
 
-def _is_connection(obj) -> bool:
+def _is_connection(obj: object) -> bool:
     return hasattr(obj, "origin") and hasattr(obj, "destiny")
 
 
-def _is_hub(obj) -> bool:
+def _is_hub(obj: object) -> bool:
     return hasattr(obj, "hub_name")
 
 
@@ -245,30 +250,31 @@ def expand_routes(rutas_input: List[Any]) -> List[List[List[List[Any]]]]:
     return broken_out_routes
 
 
-def _extract_connection(paso1):
+def _extract_connection(paso1: Any) -> Optional[Connection]:
     """Extract the first Connection object from a step list."""
     if isinstance(paso1, (list, tuple)):
         for obj in paso1:
             if _is_connection(obj):
-                return obj
+                return cast(Connection, obj)
     return None
 
 
-def _extract_destination(paso2):
+def _extract_destination(paso2: Any) -> Optional[Hub]:
     """Extract the first hub object from a step list."""
     if isinstance(paso2, (list, tuple)) and paso2:
         for obj in paso2:
             if _is_hub(obj):
-                return obj
+                return cast(Hub, obj)
     return None
 
 
-def check_and_generate_plan(shift_route: List[List[List[Any]]],
-                            start_shift: int,
-                            uso_hubs: dict,
-                            connections_use: dict,
-                            max_turns_search: int = 1000
-                            ) -> Tuple[bool, List[Any]]:
+def check_and_generate_plan(
+    shift_route: List[List[List[Any]]],
+    start_shift: int,
+    uso_hubs: Dict[Tuple[str, int], int],
+    connections_use: Dict[Tuple[Tuple[str, str], int], int],
+    max_turns_search: int = 1000,
+) -> Tuple[bool, List[Any]]:
     """Check whether a route (in per-turn form) can be placed starting at
     a given turn.
 
@@ -285,7 +291,7 @@ def check_and_generate_plan(shift_route: List[List[List[Any]]],
         and plan is the list containing None placeholders up to start_shift
         followed by the turns.
     """
-    def get_val(d, k, default=0):
+    def get_val(d: Dict[TAny, int], k: TAny, default: int = 0) -> int:
         return d.get(k, default)
 
     plan: List[Any] = [None] * start_shift
@@ -302,19 +308,16 @@ def check_and_generate_plan(shift_route: List[List[List[Any]]],
 
         connection = _extract_connection(paso1)
         if connection is not None:
-            key_con = (
-                getattr(connection.origin, "hub_name", None),
-                getattr(connection.destiny, "hub_name", None)
-            )
-            max_link = int(getattr(connection, "max_link_capacity", 1))
+            key_con = (connection.origin.hub_name, connection.destiny.hub_name)
+            max_link = int(connection.max_link_capacity)
             if get_val(connections_use, (key_con, real_shift), 0) >= max_link:
                 return False, []
 
         destination = _extract_destination(paso2)
         if destination is not None:
-            dest_name = getattr(destination, "hub_name", None)
+            dest_name = destination.hub_name
             if dest_name != "start":
-                max_drones = int(getattr(destination, "max_drones", 1))
+                max_drones = int(destination.max_drones)
                 if get_val(uso_hubs, (dest_name, real_shift), 0) >= max_drones:
                     return False, []
 
@@ -323,10 +326,12 @@ def check_and_generate_plan(shift_route: List[List[List[Any]]],
     return True, plan
 
 
-def register_usage(shift_route: List[List[List[Any]]],
-                   start_shift: int,
-                   uso_hubs: dict,
-                   connections_use: dict) -> None:
+def register_usage(
+    shift_route: List[List[List[Any]]],
+    start_shift: int,
+    uso_hubs: Dict[Tuple[str, int], int],
+    connections_use: Dict[Tuple[Tuple[str, str], int], int],
+) -> None:
     """Register precise per-turn occupancies so overlaps are tracked correctly.
 
     This function increments counters in `uso_hubs` and `connections_use`
@@ -338,19 +343,18 @@ def register_usage(shift_route: List[List[List[Any]]],
 
         connection = _extract_connection(paso1)
         if connection is not None:
-            key_con = (
-                getattr(connection.origin, "hub_name", None),
-                getattr(connection.destiny, "hub_name", None)
-            )
+            key_con = (connection.origin.hub_name, connection.destiny.hub_name)
             connections_use[(key_con, real_shift)] = connections_use.get(
-                (key_con, real_shift), 0) + 1
+                (key_con, real_shift), 0
+            ) + 1
 
         destination = _extract_destination(paso2)
         if destination is not None:
-            dest_name = getattr(destination, "hub_name", None)
+            dest_name = destination.hub_name
             if dest_name != "start":
                 uso_hubs[(dest_name, real_shift)] = uso_hubs.get(
-                    (dest_name, real_shift), 0) + 1
+                    (dest_name, real_shift), 0
+                ) + 1
 
 
 def assign_map(ordered_paths: List[Any], list_drones: List[Any]) -> List[Any]:
@@ -369,8 +373,8 @@ def assign_map(ordered_paths: List[Any], list_drones: List[Any]) -> List[Any]:
         stored on the drone object as ``route_positions``).
     """
     max_search_turns = len(ordered_paths) * 55
-    uso_hubs = {}
-    connections_use = {}
+    uso_hubs: Dict[Tuple[str, int], int] = {}
+    connections_use: Dict[Tuple[Tuple[str, str], int], int] = {}
 
     broken_out_routes = expand_routes(ordered_paths)
 
