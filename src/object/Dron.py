@@ -8,8 +8,8 @@ from typing import Optional, Any
 class Dron:
 
     drone_id: int
+    current_position: str
+    destination_position: str
     remaining_turns: int = 0
     hub: Optional[Hub] = None
-    current_position: str = None
-    destination_position: str = None
     route_positions: Any = None
