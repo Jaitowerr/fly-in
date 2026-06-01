@@ -114,19 +114,16 @@ def count_repetitions(ruta: List[Connection]) -> int:
     return repetitions
 
 
+
+
 def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
-    """Compute metadata for routes and return them ordered.
-
-    For each route this function computes:
-      - total turns (int)
-      - total priority cells (int)
-      - number of repeated connections
-
-    Routes are grouped by repetition count and within each group sorted by
-    priority descending and turns ascending.
+    """Ordena rutas por:
+       1. Menos repeticiones
+       2. Luego por longitud (menor primero)
+       3. Luego por prioridad (mayor primero)
     """
-    complete_list = []
-    for ruta in all_routes:
+    
+    def calcular_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
         turns = 0
         priority = 0
         for con in ruta:
@@ -136,23 +133,111 @@ def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple
             elif con.origin.zone == 'priority':
                 priority += 1
         repetitions = count_repetitions(ruta)
-        complete_list.append((turns, tuple(ruta), priority, repetitions))
+        return turns, priority, repetitions
 
-    grupos = {}
-    for ruta_datos in complete_list:
-        _, _, _, repetitions = ruta_datos
-        if repetitions not in grupos:
-            grupos[repetitions] = []
-        grupos[repetitions].append(ruta_datos)
+    # Calcular metadata
+    metadata_list = []
+    for ruta in all_routes:
+        turns, priority, repetitions = calcular_metadata(ruta)
+        metadata_list.append((turns, tuple(ruta), priority, repetitions))
 
-    for repe in grupos:
-        grupos[repe].sort(key=lambda x: (-x[2], x[0]))
+    # Función de ordenación
+    def criterio_orden(item):
+        turns, _, priority, repetitions = item
+        # Orden: (repeticiones ASC, largo ASC, prioridad DESC)
+        return (repetitions, turns, -priority)
 
-    result = []
-    for num_rep in sorted(grupos.keys()):
-        result.extend(grupos[num_rep])
+    # Ordenar todo junto
+    metadata_list.sort(key=criterio_orden)
 
-    return result
+    return metadata_list
+
+
+# def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
+#     """Ordena las rutas por repeticiones, prioridad y turnos."""
+    
+#     def calcular_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
+#         """Devuelve (turnos, prioridad, repeticiones)"""
+#         turns = 0
+#         priority = 0
+#         for con in ruta:
+#             turns += 1
+#             if con.origin.zone == 'restricted':
+#                 turns += 1
+#             elif con.origin.zone == 'priority':
+#                 priority += 1
+#         repetitions = count_repetitions(ruta)
+#         return turns, priority, repetitions
+
+#     # Paso 1: calcular todo el metadata
+#     complete_list = []
+#     for ruta in all_routes:
+#         turns, priority, repetitions = calcular_metadata(ruta)
+#         complete_list.append((turns, tuple(ruta), priority, repetitions))
+
+#     # Paso 2: agrupar por número de repeticiones
+#     grupos = {}
+#     for turns, ruta_tuple, priority, repetitions in complete_list:
+#         if repetitions not in grupos:
+#             grupos[repetitions] = []
+#         grupos[repetitions].append((turns, ruta_tuple, priority, repetitions))
+
+#     # Paso 3: ordenar cada grupo
+#     def orden_para_grupo(item):
+#         # Orden: prioridad DESC, turnos ASC
+#         _, _, priority, _ = item
+#         turns, _, _, _ = item
+#         return (-priority, turns)
+
+#     for repe in grupos:
+#         grupos[repe].sort(key=orden_para_grupo)
+
+#     # Paso 4: juntar todo en orden de repeticiones
+#     result = []
+#     for num_rep in sorted(grupos.keys()):
+#         result.extend(grupos[num_rep])
+
+#     return result
+
+# def sort_all_routes(all_routes: List[List[Connection]]) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
+#     """Compute metadata for routes and return them ordered.
+
+#     For each route this function computes:
+#       - total turns (int)
+#       - total priority cells (int)
+#       - number of repeated connections
+
+#     Routes are grouped by repetition count and within each group sorted by
+#     priority descending and turns ascending.
+#     """
+#     complete_list = []
+#     for ruta in all_routes:
+#         turns = 0
+#         priority = 0
+#         for con in ruta:
+#             turns += 1
+#             if con.origin.zone == 'restricted':
+#                 turns += 1
+#             elif con.origin.zone == 'priority':
+#                 priority += 1
+#         repetitions = count_repetitions(ruta)
+#         complete_list.append((turns, tuple(ruta), priority, repetitions))
+
+#     grupos = {}
+#     for ruta_datos in complete_list:
+#         _, _, _, repetitions = ruta_datos
+#         if repetitions not in grupos:
+#             grupos[repetitions] = []
+#         grupos[repetitions].append(ruta_datos)
+
+#     for repe in grupos:
+#         grupos[repe].sort(key=lambda x: (-x[2], x[0]))
+
+#     result = []
+#     for num_rep in sorted(grupos.keys()):
+#         result.extend(grupos[num_rep])
+
+#     return result
 
 
 def path(list_connect: List[Connection]) -> List[List[Connection]]:

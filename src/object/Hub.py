@@ -11,4 +11,4 @@ class Hub:
     max_drones: int = 1
     start: bool = False
     end: bool = False
-    drones_in_hub = 0
+    drones_in_hub: int = 0

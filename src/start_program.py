@@ -91,8 +91,8 @@ def list_object(args: str) -> tuple:
                     if names2 == hub.hub_name:
                         dict_connect['destiny'] = hub
                 if len(parts) == 2:
-                    metadata = parts[1].split('=')[1][:1]
-                    dict_connect['max_link_capacity'] = metadata
+                    metadata = parts[1].split('=')[1]
+                    dict_connect['max_link_capacity'] = metadata.rstrip(']')
                 list_connect.append(Connection(**dict_connect))
 
     print(f"\nTotal DRONES created: {len(list_drones)}")

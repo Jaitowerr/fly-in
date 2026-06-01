@@ -7,4 +7,4 @@ class Connection:
     origin: Hub = None
     destiny: Hub = None
     max_link_capacity: int = 1
-    drones_in_connection = 0
+    drones_in_connection: int = 0
