@@ -144,8 +144,8 @@ def validate_args(args: Any) -> bool:
     return True
 
 
-def sin_salida(connections: list, start: str, end: str,
-               blocked_list: set) -> bool:
+def not_exit(connections: list, start: str, end: str,
+             blocked_list: set) -> bool:
     """
     Check whether there is a path from start to end avoiding blocked zones.
 
@@ -402,7 +402,7 @@ def open_document(args: str) -> None:
             if not value:
                 errors.append(f'--> Missing key: {key}')
 
-    if sin_salida(connections, start_hub, end_hub, blocked_zones):
+    if not_exit(connections, start_hub, end_hub, blocked_zones):
         errors.append(
             'Map has no exit: cannot reach end_hub from start_hub')
     else:

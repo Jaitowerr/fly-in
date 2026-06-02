@@ -75,7 +75,7 @@ def print_by_turns(list_drones: List[Any]) -> None:
 
     print(f"\n{_CYAN}{'═' * 52}{_RESET}")
     print(f"{_CYAN}{_BOLD}  SIMULATION — {len(list_drones)} drones — "
-          "{max_turnos} turns{_RESET}")
+          f"{max_turnos} turns{_RESET}")
     print(f"{_CYAN}{'═' * 52}{_RESET}\n")
 
     start_hub = list_drones[0].hub  # all start at the same hub
