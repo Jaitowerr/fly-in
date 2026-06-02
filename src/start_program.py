@@ -57,7 +57,30 @@ def return_hub(
 
 
 def list_object(args: str) -> Tuple[List[Dron], List[Hub], List[Connection]]:
+    """
+    Parse a configuration file and build model objects for the simulation.
 
+    Reads `args` line by line and handles these directives:
+      - 'nb_drones: N'        -> create N Dron objects (ids 1..N)
+      - 'start_hub: ...'      -> parse hub tokens,
+      create a Hub and mark as start
+      - 'hub: ...'            -> parse hub tokens and create a Hub
+      - 'end_hub: ...'        -> parse hub tokens, create a Hub and mark as end
+      - 'connection: name1-name2 [max_link_capacity=...]'
+                              -> create Connection between existing hubs
+
+    Returns:
+        tuple: (list_drones, list_hub, list_connect)
+
+    Side effects:
+        - Prints totals of created objects.
+        - Assigns the start Hub to each Dron
+        (dron.hub and dron.current_position).
+
+    Notes:
+        - Expects well-formed input; malformed lines may raise or produce
+          incomplete objects. Validation is delegated to higher-level code.
+    """
     list_drones: List[Dron] = []
     dict_hub: Dict[str, Any] = {}
     list_hub: List[Hub] = []

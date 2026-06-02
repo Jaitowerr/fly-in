@@ -42,7 +42,6 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str,
     except Exception:
         errors.append(f"Coordinates must be integers, line {line_num}")
 
-    # print(len(list_parts))
     if len(list_parts) == 4:
         metadata = list_parts[3]
         if not (metadata.startswith('[') and metadata.endswith(']')):
@@ -51,7 +50,6 @@ def validate_hubs(list_parts: list, line_num: int, zone_type: str,
         else:
             metadata = metadata[1:-1]
             metadata = metadata.split()
-            # print(metadata)
             for data in metadata:
                 if '=' not in data:
                     errors.append(

@@ -5,7 +5,6 @@ ARGS ?= $(filter-out $@,$(MAKECMDGOALS))
 
 run:
 	@ $(MAKE) clean
-# 	@clear
 	@echo "\033[1;33m"
 	@echo ""
 	@echo "███████╗ ██╗      ██╗    ██╗      ██╗ ███╗   ██╗"
@@ -16,7 +15,6 @@ run:
 	@echo "╚═╝      ╚══════╝     ╚═╝         ╚═╝ ╚═╝  ╚═══╝"
 	@echo "\n"
 	@ $(MAKE) install
-# 	@echo "\033[1;32m"
 	@echo "\033[1;33m"
 	@poetry run python3 $(ENTRY_SCRIPT) $(ARGS)
 	@echo "\033[31m"
@@ -32,10 +30,6 @@ debug: install
 lint: install
 	@poetry run flake8 .
 	@poetry run mypy --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
-
-lint-strict: install
-	@poetry run flake8 .
-	@poetry run mypy --strict .
 
 clean:
 	@clear

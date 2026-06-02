@@ -128,7 +128,7 @@ def _design(drone_id: int) -> str:
 
 
 def print_with_animation(list_drones: List[Any], list_hubs: List[Any]) -> None:
-    """Mapa animado turno a turno. Cada dron se mueve en su eje x,y."""
+    """Animated turn-by-turn map. Each drone moves along its x,y axis."""
 
     drones = sorted(list_drones, key=lambda d: d.drone_id)
     max_turnos = max((len(d.route_positions) for d in drones if
