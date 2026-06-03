@@ -1,7 +1,7 @@
 *This project has been created as part of the 42 curriculum by [aitorres].*
 
 
-<svg width="600" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg">
   <text x="340" y="20"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">███████╗ ██╗      ██╗    ██╗      ██╗ ███╗   ██╗</text>
   <text x="340" y="36"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">██╔════╝ ██║       ██║  ██╔╝      ██║ ████╗  ██║</text>
   <text x="340" y="52"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">█████╗   ██║       ╚██╗██╔╝  ▄▄▄  ██║ ██╔██╗ ██║</text>
