@@ -1,65 +1,15 @@
 *This project has been created as part of the 42 curriculum by [aitorres].*
 
 
-        	███████╗ ██╗      ██╗    ██╗      ██╗ ███╗   ██╗
-        	██╔════╝ ██║       ██║  ██╔╝      ██║ ████╗  ██║
-        	█████╗   ██║       ╚██╗██╔╝  ▄▄▄  ██║ ██╔██╗ ██║
-        	██╔══╝   ██║         ╚██╔╝   ▀▀▀  ██║ ██║╚██╗██║
-        	██║      ███████╗     ██║         ██║ ██║ ╚████║      ~╚¥╝~     ╠═▄▄═╣     ╠═¤¤═╣     ╠¤¤╣     ╠-¥-╣    ╠--▄▄--╣"
-        	╚═╝      ╚══════╝     ╚═╝         ╚═╝ ╚═╝  ╚═══╝
-
-
-### Description
-
-This project is provided as a student exercise for the 42 curriculum. It processes input text files and performs the project-specific operations implemented in the source code. The repository contains the full implementation; this README summarizes how to run the program, the design considerations, and references.
-
-### Instructions
-
-Requirements:
-- Python 3.8+ (if the project contains Python files)
-- make (to use the provided Makefile)
-- pip
-
-If your project has Python dependencies, provide a requirements.txt file. If not, no Python packages are required beyond the standard library.
-
-Execution:
-
-- make run <archivo.txt>
-- Example: `make run sample_input.txt` (replace `sample_input.txt` with the input file you want to process).
-
-### Algorithm choices and implementation strategy
-
-The detailed algorithmic choices are implemented in the source files. In general terms, the program reads an input text file, parses the contents, and executes the transformations and computations required by the assignment. The codebase is organized in source modules that separate parsing, core logic, and output/visualization where applicable. For precise complexity analysis and per-function explanations, please consult the comments inside the source files (comments have been prepared and can be translated to Spanish if desired).
-
-### Visual representation and user experience
-
-If the project produces visual output (ASCII art, graphical images, or plots), those components are documented in the source files. Visual outputs are used to improve user comprehension by providing immediate feedback and representations of processed data. See the corresponding modules for specifics.
-
-### Resources
-
-- Python documentation: https://docs.python.org/3/
-- flake8: https://flake8.pycqa.org/
-- mypy: https://mypy-lang.org/
-
-### How AI was used
-
-AI was used to assist with: writing and troubleshooting functions, translating comments and drafts of the README between Spanish and English, and suggesting style/type adjustments (flake8/mypy). All changes to code were avoided by request; only the README file was generated.
-
-### Additional notes
-
-- This README was generated automatically based on the archive contents and the instructions provided by the project owner.
-- If you want a Spanish version or a more detailed algorithm section filled with concrete function-by-function descriptions, I can extract comments from source files and translate them to produce a fuller README.
-
-
-
-
-
-
-
-
-
-
-
+<svg width="600" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="340" y="20"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">███████╗ ██╗      ██╗    ██╗      ██╗ ███╗   ██╗</text>
+  <text x="340" y="36"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">██╔════╝ ██║       ██║  ██╔╝      ██║ ████╗  ██║</text>
+  <text x="340" y="52"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">█████╗   ██║       ╚██╗██╔╝  ▄▄▄  ██║ ██╔██╗ ██║</text>
+  <text x="340" y="68"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">██╔══╝   ██║         ╚██╔╝   ▀▀▀  ██║ ██║╚██╗██║</text>
+  <text x="340" y="84"  text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">██║      ███████╗     ██║         ██║ ██║ ╚████║</text>
+  <text x="340" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#f5c400" xml:space="preserve">╚═╝      ╚══════╝     ╚═╝         ╚═╝ ╚═╝  ╚═══╝</text>
+  <text x="340" y="120" text-anchor="middle" font-family="monospace" font-size="12" fill="#f5c400" opacity="0.7" xml:space="preserve">~╚¥╝~     ╠═▄▄═╣     ╠═¤¤═╣     ╠¤¤╣     ╠-¥-╣    ╠--▄▄--╣</text>
+</svg>
 
 ## Description
 
@@ -107,7 +57,6 @@ make run /home/user/mymap.txt
 | `make install` | Install all Poetry dependencies |
 | `make debug <file.txt>` | Run the simulator under `pdb` debugger |
 | `make lint` | Run `flake8` + `mypy` (standard flags) |
-| `make lint-strict` | Run `flake8` + `mypy --strict` |
 | `make clean` | Remove `__pycache__`, `.mypy_cache`, build artefacts |
 
 ### Input file format
