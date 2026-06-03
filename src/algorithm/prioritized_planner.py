@@ -69,7 +69,7 @@ def explore_route(
     for con in list_connect:
         if con.origin.hub_name == destination_rut.hub_name:
             veces = conteo_hubs.get(con.destiny.hub_name, 0)
-            if veces >= 5:
+            if veces >= 2:
                 continue
             nueva_ruta = ruta_actual + [con]
             explore_route(con, nueva_ruta, list_connect, all_routes)
@@ -127,39 +127,36 @@ def count_repetitions(ruta: List[Connection]) -> int:
 def sort_all_routes(
     all_routes: List[List[Connection]]
 ) -> List[Tuple[int, Tuple[Connection, ...], int, int]]:
-    """Ordena rutas por:
-       1. Menos repeticiones
-       2. Luego por longitud (menor primero)
-       3. Luego por prioridad (mayor primero)
-    """
+    '''
+    Order routes by:
+    1. Fewest repetitions
+    2. Then by length (shortest first)
+    3. Then by priority (longest first)
+    '''
 
-    def calcular_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
+    def calculate_metadata(ruta: List[Connection]) -> Tuple[int, int, int]:
         turns = 0
         priority = 0
         for con in ruta:
             turns += 1
-            if con.origin.zone == 'restricted':
+            if con.destiny.zone == 'restricted':
                 turns += 1
             elif con.origin.zone == 'priority':
                 priority += 1
         repetitions = count_repetitions(ruta)
         return turns, priority, repetitions
 
-    # Calcular metadata
     metadata_list: List[Tuple[int, Tuple[Connection, ...], int, int]] = []
     for ruta in all_routes:
-        turns, priority, repetitions = calcular_metadata(ruta)
+        turns, priority, repetitions = calculate_metadata(ruta)
         metadata_list.append((turns, tuple(ruta), priority, repetitions))
 
-    # Función de ordenación
     def criterio_orden(
         item: Tuple[int, Tuple[Connection, ...], int, int]
     ) -> Tuple[int, int, int]:
         turns, _, priority, repetitions = item
-        # Orden: (repeticiones ASC, largo ASC, prioridad DESC)
         return (repetitions, turns, -priority)
 
-    # Ordenar todo junto
     metadata_list.sort(key=criterio_orden)
 
     return metadata_list
