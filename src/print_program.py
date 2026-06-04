@@ -6,15 +6,29 @@ from random import choice as rmc
 from typing import List, Any, Sequence, Dict
 from src.algorithm.prioritized_planner import Planner
 
+
 class Printer:
     _ANSI = {
-        "green": "\033[32m", "yellow": "\033[33m", "red": "\033[31m",
-        "blue": "\033[34m", "cyan": "\033[36m", "magenta": "\033[35m",
-        "white": "\033[37m", "purple": "\033[35;1m", "orange": "\033[38;5;208m",
-        "brown": "\033[38;5;130m", "maroon": "\033[38;5;88m", "black": "\033[90m",
-        "gold": "\033[33;1m", "violet": "\033[35;1m", "crimson": "\033[31;1m",
-        "darkred": "\033[31m", "rainbow": "\033[36;1m", "lime": "\033[38;5;118m",
-        "gray": "\033[38;5;244m", "marron": "\033[38;5;88m",
+        "green": "\033[32m",
+        "yellow": "\033[33m",
+        "red": "\033[31m",
+        "blue": "\033[34m",
+        "cyan": "\033[36m",
+        "magenta": "\033[35m",
+        "white": "\033[37m",
+        "purple": "\033[35;1m",
+        "orange": "\033[38;5;208m",
+        "brown": "\033[38;5;130m",
+        "maroon": "\033[38;5;88m",
+        "black": "\033[90m",
+        "gold": "\033[33;1m",
+        "violet": "\033[35;1m",
+        "crimson": "\033[31;1m",
+        "darkred": "\033[31m",
+        "rainbow": "\033[36;1m",
+        "lime": "\033[38;5;118m",
+        "gray": "\033[38;5;244m",
+        "marron": "\033[38;5;88m",
         "darked": "\033[38;5;52m",
     }
 
@@ -33,7 +47,7 @@ class Printer:
         ' ╠--▄▄--╣ '
     ]
 
-    _design_cache = {}
+    _design_cache: Dict[int, str] = {}
 
     def print_launch_drones(self, list_drones: Sequence[Any]) -> None:
         """
@@ -56,7 +70,11 @@ class Printer:
         print(f"{self._BOLD}  q{self._RESET} — Salir")
         print(f"{self._CYAN}{'─' * 40}{self._RESET}")
 
-    def print_by_turns(self, list_drones: List[Any], show_capacity: bool = False) -> None:
+    def print_by_turns(
+        self,
+        list_drones: List[Any],
+        show_capacity: bool = False,
+    ) -> None:
         """
         Print the simulation turn-by-turn in text mode using ANSI colors.
 
@@ -66,18 +84,25 @@ class Printer:
         """
         drones_ordenados = sorted(list_drones, key=lambda d: d.drone_id)
         max_turnos = max(
-            (len(d.route_positions) for d in drones_ordenados if d.route_positions),
+            (len(d.route_positions)
+             for d in drones_ordenados if d.route_positions),
             default=0,
         )
 
         print(f"\n{self._CYAN}{'═' * 52}{self._RESET}")
-        print(f"{self._CYAN}{self._BOLD}  SIMULATION — {len(list_drones)} drones — "
-            f"{max_turnos} turns{self._RESET}")
+        print(
+            f"{self._CYAN}{self._BOLD}  SIMULATION — "
+            f"{len(list_drones)} drones — {max_turnos} turns{self._RESET}"
+        )
         print(f"{self._CYAN}{'═' * 52}{self._RESET}\n")
 
-        start_hub = list_drones[0].hub  # all start at the same hub
-        drones_str = "  ".join(f"D{d.drone_id}" for d in drones_ordenados)
-        print(f"{self._CYAN}Start ({start_hub.hub_name}):{self._RESET}  {drones_str}\n")
+        start_hub = list_drones[0].hub
+        drone_names = [f"D{d.drone_id}" for d in drones_ordenados]
+        drones_str = "  ".join(drone_names)
+        print(
+            f"{self._CYAN}Start ({start_hub.hub_name}):"
+            f"{self._RESET}  {drones_str}\n"
+        )
 
         for t in range(max_turnos):
             movs = []
@@ -94,38 +119,64 @@ class Printer:
                 dest_str = ""
                 for obj in paso2:
                     if Planner._is_hub(obj):
-                        color_code = self._ANSI.get(getattr(obj, "color", "") or "", "\033[37m")
-                        dest_str = f"{color_code}{self._BOLD}{obj.hub_name}{self._RESET}"
-
+                        color_code = self._ANSI.get(
+                            getattr(obj, "color", "") or "", "\033[37m"
+                        )
+                        dest_str = (
+                            f"{color_code}{self._BOLD}{obj.hub_name}"
+                            f"{self._RESET}"
+                        )
                         if show_capacity:
-                            occupancy_hubs[obj.hub_name] = occupancy_hubs.get(obj.hub_name, 0) + 1
+                            occupancy_hubs[obj.hub_name] = occupancy_hubs.get(
+                                obj.hub_name, 0
+                            ) + 1
                         break
                     if Planner._is_connection(obj):
-                        nombre = f"{obj.origin.hub_name}-{obj.destiny.hub_name}"
-                        dest_str = f"\033[33m\033[3m{nombre}{self._RESET}"
-
+                        nombre = (
+                            f"{obj.origin.hub_name}-"
+                            f"{obj.destiny.hub_name}"
+                        )
+                        dest_str = (
+                            f"\033[33m\033[3m{nombre}{self._RESET}"
+                        )
                         if show_capacity:
-                            occupancy_conns[nombre] = occupancy_conns.get(nombre, 0) + 1
+                            occupancy_conns[nombre] = occupancy_conns.get(
+                                nombre, 0
+                            ) + 1
                         break
                 if dest_str:
-                    movs.append(f"\033[37;1mD{dron.drone_id}{self._RESET}-{dest_str}")
+                    movs.append(
+                        f"\033[37;1mD{dron.drone_id}{self._RESET}-{dest_str}"
+                    )
             if movs:
-                print(f"{self._CYAN}Turn {t + 1:>3}:{self._RESET}  {'    '.join(movs)}")
+                mov_line = "    ".join(movs)
+                print(f"{self._CYAN}Turn {t + 1:>3}:{self._RESET}  {mov_line}")
                 if show_capacity:
                     if occupancy_hubs:
                         hubs_lines = []
                         for hub_name, cnt in sorted(occupancy_hubs.items()):
                             hubs_lines.append(f"Zona {hub_name}: {cnt} drones")
-                        print(f"   [Capacity - Hubs] " + "  |  ".join(hubs_lines))
+                        print(
+                            "   [Capacity - Hubs] "
+                            + "  |  ".join(hubs_lines)
+                        )
                     if occupancy_conns:
                         conns_lines = []
                         for conn_name, cnt in sorted(occupancy_conns.items()):
-                            conns_lines.append(f"Conexión {conn_name}: {cnt} used")
-                        print(f"   [Capacity - Connections] " + "  |  ".join(conns_lines))
+                            conns_lines.append(
+                                f"Conexión {conn_name}: {cnt} used"
+                            )
+                        print(
+                            "   [Capacity - Connections] "
+                            + "  |  ".join(conns_lines)
+                        )
                 time.sleep(0.5)
 
         print(f"\n{self._CYAN}{'═' * 52}{self._RESET}")
-        print(f"{self._GREEN}{self._BOLD}  Completed in {max_turnos} turns.{self._RESET}")
+        print(
+            f"{self._GREEN}{self._BOLD}  Completed in {max_turnos} turns."
+            f"{self._RESET}"
+        )
         print(f"{self._CYAN}{'═' * 52}{self._RESET}\n")
 
     def _design(self, drone_id: int) -> str:
@@ -134,7 +185,10 @@ class Printer:
             self._design_cache[drone_id] = rmc(self._DESIGNS)
         return self._design_cache[drone_id]
 
-    def print_with_animation(self, list_drones: List[Any], list_hubs: List[Any]) -> None:
+    def print_with_animation(
+            self,
+            list_drones: List[Any],
+            list_hubs: List[Any]) -> None:
         """
         Animated turn-by-turn map. Each drone moves along its x,y axis.
         """
@@ -160,7 +214,9 @@ class Printer:
 
         pos = {}
         for dron in drones:
-            hub = next((h for h in list_hubs if h.hub_name == dron.current_position), None)
+            hub = next(
+                (h for h in list_hubs if h.hub_name == dron.current_position),
+                None)
             if hub:
                 pos[dron.drone_id] = (float(hub.x), float(hub.y))
 
@@ -189,7 +245,10 @@ class Printer:
                 write(f - 1, c, f'D{dron.drone_id}')
 
             os.system('clear')
-            print(f"{self._CYAN}{self._BOLD} Turno {turno_num}/{max_turnos}{self._RESET}")
+            print(
+                f"{self._CYAN}{self._BOLD} Turno {turno_num}/{max_turnos}"
+                f"{self._RESET}"
+            )
             for fila in grid:
                 print(''.join(fila))
 
@@ -205,7 +264,8 @@ class Printer:
                 if turno is None:
                     continue
                 _, paso2 = turno
-                obj = next((o for o in paso2 if Planner._is_hub(o) or Planner._is_connection(o)), None)
+                obj = next((o for o in paso2 if Planner._is_hub(o)
+                            or Planner._is_connection(o)), None)
                 if obj is None:
                     continue
                 if Planner._is_hub(obj):
@@ -235,5 +295,8 @@ class Printer:
 
         paint(max_turnos)
         print(f"\n{self._CYAN}{'═' * 40}{self._RESET}")
-        print(f"\033[32m{self._BOLD}  Completed in {max_turnos} turns.{self._RESET}")
+        print(
+            f"\033[32m{
+                self._BOLD}  Completed in {max_turnos} turns.{
+                self._RESET}")
         print(f"{self._CYAN}{'═' * 40}{self._RESET}\n")

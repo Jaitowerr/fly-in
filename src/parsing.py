@@ -1,33 +1,37 @@
 from typing import Any
 import sys
-from dataclasses import dataclass
 
-class Parse():
-    def __init__(self, list_argument):
+
+class Parse:
+    def __init__(self, list_argument: list[Any]) -> None:
         self.list_argument: list[Any] = list_argument or []
         self.argument = ""
 
-    
-    def validate_hubs(self, list_parts: list, line_num: int, zone_type: str,
-                    blocked_list: set) -> tuple:
+    def validate_hubs(
+        self,
+        list_parts: list[str],
+        line_num: int,
+        zone_type: str,
+        blocked_list: set[str],
+    ) -> tuple[None | str, None | int, None | int, list[str], set[str]]:
         """
         Validate hub/token data parsed from a config line.
 
         Checks name, integer coordinates and optional metadata. Returns a tuple
-        (name, x, y, errors, blocked_list) where errors is a list of human readable
-        error messages and blocked_list is updated if the zone is marked blocked.
+        (name, x, y, errors, blocked_list) where errors is a list of human
+        readable error messages and blocked_list is updated if the zone is
+        marked blocked.
         """
         errors = []
         name = None
         x = None
         y = None
         metadata = None
-        zone_types = ['normal', 'blocked', 'restricted', 'priority']
         colors = [
-            'green', 'yellow', 'red', 'blue', 'gray', 'darked', 'gold', 'black',
-            'marron', 'orange', 'brown', 'purple', 'maroon', 'darkred', 'violet',
-            'crimson', 'rainbow', 'cyan', 'lime', 'magenta'
-        ]
+            'green', 'yellow', 'red', 'blue', 'gray', 'darked', 'gold',
+            'black', 'marron', 'orange', 'brown', 'purple', 'maroon',
+            'darkred', 'violet', 'crimson', 'rainbow', 'cyan', 'lime',
+            'magenta']
 
         if len(list_parts) < 3:
             errors.append(f"Missing data for {zone_type}, line {line_num}")
@@ -52,53 +56,65 @@ class Parse():
             metadata = list_parts[3]
             if not (metadata.startswith('[') and metadata.endswith(']')):
                 errors.append(
-                    f"Metadata must be enclosed in [] brackets, line {line_num}")
+                    f"Metadata must be enclosed in [] brackets, "
+                    f"line {line_num}"
+                )
             else:
-                metadata = metadata[1:-1]
-                metadata = metadata.split()
-                for data in metadata:
-                    if '=' not in data:
-                        errors.append(
-                            f"Invalid metadata: {data}, missing '=' line "
-                            f"{line_num}")
-                        continue
+                metadata_body = metadata[1:-1].strip()
+                if metadata_body:
+                    metadata_items = metadata_body.split()
+                    for data in metadata_items:
 
-                    key, val = data.split('=', 1)
+                        if '=' in data:
+                            key, val = data.split('=', 1)
+                        else:
+                            key, val = data, None
 
-                    if key == 'color':
-                        if val not in colors:
-                            errors.append(
-                                f"Color not allowed: {val}, line {line_num}")
-
-                    elif key == 'max_drones':
-                        try:
-                            int(val)
-                        except Exception:
-                            errors.append(
-                                f"max_drones must be an integer: {val}, "
-                                f"line {line_num}")
-
-                    elif key == 'max_link_capacity':
-                        try:
-                            int(val)
-                        except Exception:
-                            errors.append(
-                                f"max_link_capacity must be an integer: {val}, "
-                                f"line {line_num}")
-
-                    elif key == 'zone':
-                        if val not in zone_types:
-                            errors.append(
-                                f"Invalid zone type: {val}, line {line_num}")
-                        elif val == 'blocked':
+                        if key == 'color':
+                            if val is None or val not in colors:
+                                errors.append(f"Color not allowed: {val},"
+                                              f" line {line_num}")
+                        elif key == 'max_drones':
+                            if val is None:
+                                errors.append(f"max_drones missing value, "
+                                              f"line {line_num}")
+                            else:
+                                try:
+                                    int(val)
+                                except Exception:
+                                    errors.append(f"max_drones must be an "
+                                                  f"integer: {val}, "
+                                                  f"line {line_num}")
+                        elif key == 'max_link_capacity':
+                            if val is None:
+                                errors.append(f"max_link_capacity missing "
+                                              f"value, line {line_num}")
+                            else:
+                                try:
+                                    int(val)
+                                except Exception:
+                                    errors.append(
+                                        f"max_link_capacity must be an "
+                                        f"integer: {val}, line {line_num}"
+                                    )
+                        elif key == 'blocked':
+                            # blocked as flag (either "blocked" or "blocked=1")
                             blocked_list.add(name)
-                    else:
-                        errors.append(
-                            f'Check metadata, invalid metadata item {data} '
-                            f'on line {line_num}')
+                        elif key == 'zone':
+                            allowed = {'restricted', 'priority', 'normal',
+                                       'blocked'}
+                            if val is None or val not in allowed:
+                                errors.append(
+                                    f"Invalid zone value: {val}, allowed: "
+                                    f"{sorted(allowed)}, line {line_num}"
+                                )
+                            if val == 'blocked':
+                                blocked_list.add(name)
+                        else:
+                            errors.append(f'Check metadata, invalid metadata '
+                                          f'item {data} on line {line_num}')
 
         return name, x, y, errors, blocked_list
-
 
     def validate_args(self) -> bool:
         self.capacity_info = False
@@ -114,7 +130,8 @@ class Parse():
             errors.append(
                 'Missing configuration file; run: make run <file.txt>')
 
-        if len(self.list_argument) and not self.list_argument[0].endswith('.txt'):
+        if len(self.list_argument) and not self.list_argument[0].endswith(
+                '.txt'):
             errors.append(
                 'Ensure the provided file has a .txt extension')
 
@@ -149,14 +166,19 @@ class Parse():
         self.argument = argument
         return True
 
-
-    def not_exit(self, connections: list, start: str, end: str,
-                blocked_list: set) -> bool:
+    def not_exit(
+        self,
+        connections: list[tuple[str, str]],
+        start: str,
+        end: str,
+        blocked_list: set[str],
+    ) -> bool:
         """
-        Check whether there is a path from start to end avoiding blocked zones.
+        Check whether there is a path from start to end avoiding blocked
+        zones.
 
-        Returns True if there is NO path (i.e. map has no exit), False if a path
-        exists.
+        Returns True if there is NO path (i.e. map has no exit),
+        False if a path exists.
         """
         if start in blocked_list or end in blocked_list:
             return True
@@ -189,13 +211,12 @@ class Parse():
                     to_visit.append(neighbor)
         return True
 
-
     def open_document(self) -> None:
         """
         Parse and validate the entire configuration document.
 
-        This function collects errors and exits the program with a summary if the
-        file has invalid lines or missing required keys.
+        This function collects errors and exits the program with a summary if
+        the file has invalid lines or missing required keys.
         """
         errors = []
         required = {'nb_drones': False, 'start_hub': False,
@@ -218,7 +239,9 @@ class Parse():
                 elif line.startswith('nb_drones: '):
                     if required['nb_drones']:
                         errors.append(
-                            f'nb_drones appears more than once, line {line_num}')
+                            f'nb_drones appears more than once, '
+                            f'line {line_num}'
+                        )
 
                     try:
                         int(line.split(': ', 1)[1])
@@ -229,30 +252,37 @@ class Parse():
                 elif line.startswith('start_hub: '):
                     if required['start_hub']:
                         errors.append(
-                            f'start_hub appears more than once, line {line_num}')
-
+                            f'start_hub appears more than once, '
+                            f'line {line_num}'
+                        )
                     else:
                         try:
                             line_clean = line.split(': ', 1)[1].rstrip('\n')
                             parts = line_clean.split(' ', 3)
-                            name, x, y, errs, blocked_zones = self.validate_hubs(
-                                parts, line_num, 'start_hub', blocked_zones)
+                            name, x, y, errs, blocked_zones = (
+                                self.validate_hubs(
+                                    parts, line_num, 'start_hub',
+                                    blocked_zones
+                                )
+                            )
                             if errs:
                                 errors.extend(errs)
-                            if name in zones_names:
-                                errors.append(
-                                    f"Duplicate zone name: {name}, line "
-                                    f"{line_num}")
-                            else:
-                                zones_names.append(name)
-                                start_hub = name
+                            if name is not None:
+                                if name in zones_names:
+                                    errors.append(
+                                        f"Duplicate zone name: {name}, line "
+                                        f"{line_num}")
+                                else:
+                                    zones_names.append(name)
+                                    start_hub = name
 
-                            if (x, y) in positions_xy:
-                                errors.append(
-                                    f"Duplicate position: ({x},{y}), line "
-                                    f"{line_num}")
-                            else:
-                                positions_xy.append((x, y))
+                            if x is not None and y is not None:
+                                if (x, y) in positions_xy:
+                                    errors.append(
+                                        f"Duplicate position: ({x},{y}), line "
+                                        f"{line_num}")
+                                else:
+                                    positions_xy.append((x, y))
 
                             required['start_hub'] = True
 
@@ -271,16 +301,22 @@ class Parse():
                             parts, line_num, 'hub', blocked_zones)
                         if errs:
                             errors.extend(errs)
-                        if name in zones_names:
-                            errors.append(
-                                f"Duplicate zone name: {name}, line {line_num}")
-                        else:
-                            zones_names.append(name)
-                        if (x, y) in positions_xy:
-                            errors.append(
-                                f"Duplicate position: ({x},{y}), line {line_num}")
-                        else:
-                            positions_xy.append((x, y))
+                        if name is not None:
+                            if name in zones_names:
+                                errors.append(
+                                    f"Duplicate zone name: {name}, "
+                                    f"line {line_num}"
+                                )
+                            else:
+                                zones_names.append(name)
+                        if x is not None and y is not None:
+                            if (x, y) in positions_xy:
+                                errors.append(
+                                    f"Duplicate position: ({x},{y}), "
+                                    f"line {line_num}"
+                                )
+                            else:
+                                positions_xy.append((x, y))
 
                     except Exception:
                         errors.append(
@@ -298,23 +334,29 @@ class Parse():
                             line_clean = line.split(': ', 1)[1].rstrip('\n')
                             parts = line_clean.split(' ', 3)
 
-                            name, x, y, errs, blocked_zones = self.validate_hubs(
-                                parts, line_num, 'end_hub', blocked_zones)
+                            name, x, y, errs, blocked_zones = (
+                                self.validate_hubs(
+                                    parts, line_num, 'end_hub',
+                                    blocked_zones
+                                )
+                            )
                             if errs:
                                 errors.extend(errs)
-                            if name in zones_names:
-                                errors.append(
-                                    f"Duplicate zone name: {name}, line "
-                                    f"{line_num}")
-                            else:
-                                zones_names.append(name)
-                                end_hub = name
-                            if (x, y) in positions_xy:
-                                errors.append(
-                                    f"Duplicate position: ({x},{y}), line "
-                                    f"{line_num}")
-                            else:
-                                positions_xy.append((x, y))
+                            if name is not None:
+                                if name in zones_names:
+                                    errors.append(
+                                        f"Duplicate zone name: {name}, line "
+                                        f"{line_num}")
+                                else:
+                                    zones_names.append(name)
+                                    end_hub = name
+                            if x is not None and y is not None:
+                                if (x, y) in positions_xy:
+                                    errors.append(
+                                        f"Duplicate position: ({x},{y}), line "
+                                        f"{line_num}")
+                                else:
+                                    positions_xy.append((x, y))
 
                             required['end_hub'] = True
 
@@ -333,7 +375,9 @@ class Parse():
 
                         if '-' not in zone_pair:
                             errors.append(
-                                "Invalid connection format, expected: name1-name2")
+                                "Invalid connection format, expected: "
+                                "name1-name2"
+                            )
                         else:
                             name1, name2 = zone_pair.split('-', 1)
                             if (name1 not in zones_names or
@@ -342,37 +386,42 @@ class Parse():
                                     f"Invalid connection: one or both names "
                                     f"do not exist ({name1}-{name2})")
                             elif ((name1, name2) in connections or
-                                (name2, name1) in connections):
+                                  (name2, name1) in connections):
                                 errors.append(
-                                    f"Invalid connection: duplicate connection "
-                                    f"({name1}-{name2})")
+                                    "Invalid connection: duplicate "
+                                    f"connection ({name1}-{name2})"
+                                )
                             else:
                                 connections.append((name1, name2))
                                 connections.append((name2, name1))
 
                         if len(parts) == 2:
                             meta_str = parts[1]
-                            if not (meta_str.startswith('[') and
-                                    meta_str.endswith(']')):
+                            if not (meta_str.startswith('[')
+                                    and meta_str.endswith(']')):
                                 errors.append(
-                                    f"Metadata must be enclosed in [] brackets, "
-                                    f"line {line_num}")
+                                    "Metadata must be enclosed in [] "
+                                    "brackets, "
+                                    f"line {line_num}"
+                                )
                             else:
-                                from typing import Any
-                                meta_content: Any = meta_str[1:-1]
+                                meta_content = meta_str[1:-1]
                                 if '=' not in meta_content:
                                     errors.append(
-                                        f"Invalid metadata: {meta_content}, "
-                                        f"missing '=', line {line_num}")
+                                        "Invalid metadata: "
+                                        f"{meta_content}, missing '=', "
+                                        f"line {line_num}"
+                                    )
                                 else:
                                     if meta_content:
-                                        meta_content = meta_content.split()
-                                        for item in meta_content:
+                                        meta_items = meta_content.split()
+                                        for item in meta_items:
                                             if '=' not in item:
                                                 errors.append(
-                                                    f"Invalid metadata: {item}, "
-                                                    f"missing '=', line "
-                                                    f"{line_num}")
+                                                    "Invalid metadata: "
+                                                    f"{item}, missing '=', "
+                                                    f"line {line_num}"
+                                                )
                                             else:
                                                 key, val = item.split('=', 1)
                                                 if key == 'max_link_capacity':
@@ -380,15 +429,18 @@ class Parse():
                                                         int(val)
                                                     except Exception:
                                                         errors.append(
-                                                            f"max_link_capacity "
-                                                            f"must be integer: "
+                                                            "max_link_capacity"
+                                                            " must be "
+                                                            "integer: "
                                                             f"{val}, "
-                                                            f"line {line_num}")
+                                                            f"line {line_num}"
+                                                        )
                                                 else:
                                                     errors.append(
-                                                        f"Metadata key not "
+                                                        "Metadata key not "
                                                         f"allowed: {key}, "
-                                                        f"line {line_num}")
+                                                        f"line {line_num}"
+                                                    )
 
                         elif len(parts) > 2:
                             errors.append(

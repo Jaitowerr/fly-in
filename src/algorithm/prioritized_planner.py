@@ -6,7 +6,7 @@ from src.object.Hub import Hub
 
 
 class Planner:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @staticmethod
@@ -56,7 +56,11 @@ class Planner:
 
         for connection in home_connections:
             initial_path = [connection]
-            self._explore_route(connection, initial_path, list_connect, all_routes)
+            self._explore_route(
+                connection,
+                initial_path,
+                list_connect,
+                all_routes)
         return all_routes
 
     def _count_repetitions(self, ruta: List[Connection]) -> int:
@@ -94,17 +98,21 @@ class Planner:
             turns, priority, repetitions = calculate_metadata(ruta)
             metadata_list.append((turns, tuple(ruta), priority, repetitions))
 
-        def criterio_orden(item: Tuple[int, Tuple[Connection, ...], int, int]) -> Tuple[int, int, int]:
+        def criterio_orden(
+            item: Tuple[int, Tuple[Connection, ...], int, int]
+        ) -> Tuple[int, int, int]:
             turns, _, priority, repetitions = item
             return (repetitions, turns, -priority)
 
         metadata_list.sort(key=criterio_orden)
         return metadata_list
 
-    def compute_routes(self, list_connect: List[Connection]) -> List[List[Connection]]:
+    def compute_routes(
+            self, list_connect: List[Connection]) -> List[List[Connection]]:
         all_routes = self._find_routes_from_start(list_connect)
         ordered_paths = self._sort_all_routes(all_routes)
-        end_paths: List[List[Connection]] = [list(ruta) for _, ruta, _, _ in ordered_paths]
+        end_paths: List[List[Connection]] = [
+            list(ruta) for _, ruta, _, _ in ordered_paths]
         return end_paths
 
     def _route_by_turns(self, conns: List[Any]) -> List[List[List[Any]]]:
@@ -122,7 +130,8 @@ class Planner:
                 turnos.append(turno)
         return turnos
 
-    def _expand_routes(self, rutas_input: List[Any]) -> List[List[List[List[Any]]]]:
+    def _expand_routes(self,
+                       rutas_input: List[Any]) -> List[List[List[List[Any]]]]:
         broken_out_routes: List[List[List[List[Any]]]] = []
         for ruta in rutas_input:
             route_conns = None
@@ -132,7 +141,11 @@ class Planner:
                 and isinstance(ruta[1], (list, tuple))
             ):
                 route_conns = list(ruta[1])
-            elif isinstance(ruta, list) and ruta and self._is_connection(ruta[0]):
+            elif (
+                isinstance(ruta, list)
+                and ruta
+                and self._is_connection(ruta[0])
+            ):
                 route_conns = ruta
             else:
                 try:
@@ -188,9 +201,15 @@ class Planner:
 
             connection = self._extract_connection(paso1)
             if connection is not None:
-                key_con = (connection.origin.hub_name, connection.destiny.hub_name)
+                key_con = (
+                    connection.origin.hub_name,
+                    connection.destiny.hub_name)
                 max_link = int(connection.max_link_capacity)
-                if get_val(connections_use, (key_con, real_shift), 0) >= max_link:
+                if get_val(
+                        connections_use,
+                        (key_con,
+                         real_shift),
+                        0) >= max_link:
                     return False, []
 
             destination = self._extract_destination(paso2)
@@ -198,7 +217,11 @@ class Planner:
                 dest_name = destination.hub_name
                 if dest_name != "start":
                     max_drones = int(destination.max_drones)
-                    if get_val(uso_hubs, (dest_name, real_shift), 0) >= max_drones:
+                    if get_val(
+                        uso_hubs,
+                        (dest_name, real_shift),
+                        0,
+                    ) >= max_drones:
                         return False, []
 
             plan.append(turno)
@@ -218,7 +241,9 @@ class Planner:
 
             connection = self._extract_connection(paso1)
             if connection is not None:
-                key_con = (connection.origin.hub_name, connection.destiny.hub_name)
+                key_con = (
+                    connection.origin.hub_name,
+                    connection.destiny.hub_name)
                 connections_use[(key_con, real_shift)] = connections_use.get(
                     (key_con, real_shift), 0
                 ) + 1
@@ -231,7 +256,10 @@ class Planner:
                         (dest_name, real_shift), 0
                     ) + 1
 
-    def assign_routes_to_drones(self, ordered_paths: List[Any], list_drones: List[Any]) -> List[Any]:
+    def assign_routes_to_drones(
+            self,
+            ordered_paths: List[Any],
+            list_drones: List[Any]) -> List[Any]:
         max_search_turns = len(ordered_paths) * 55
         uso_hubs: Dict[Tuple[str, int], int] = {}
         connections_use: Dict[Tuple[Tuple[str, str], int], int] = {}

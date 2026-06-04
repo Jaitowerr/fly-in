@@ -13,15 +13,16 @@ from typing import (
 
 
 class Application:
-    def __init__(self, parser):
+    def __init__(self, parser: Any) -> None:
         self.parser = parser
-        self.printer = None
+        self.printer: Any = None
 
     def return_hub(
         self, hub: List[str], zone_type: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Parse a hub token list and return a dictionary suitable for Hub(**dict).
+        Parse a hub token list and return a dictionary suitable for a Hub
+        constructor.
 
         Args:
             hub (list): List of tokens for the hub (name, x, y, [metadata]).
@@ -59,18 +60,24 @@ class Application:
 
         return dict_hub
 
-    def list_objects(self, args: str) -> Tuple[List[Dron], List[Hub], List[Connection]]:
+    def list_objects(self,
+                     args: str) -> Tuple[List[Dron],
+                                         List[Hub],
+                                         List[Connection]]:
         """
         Parse a configuration file and build model objects for the simulation.
 
         Reads `args` line by line and handles these directives:
-        - 'nb_drones: N'        -> create N Dron objects (ids 1..N)
-        - 'start_hub: ...'      -> parse hub tokens,
-        create a Hub and mark as start
-        - 'hub: ...'            -> parse hub tokens and create a Hub
-        - 'end_hub: ...'        -> parse hub tokens, create a Hub and mark as end
+        - 'nb_drones: N'
+          -> create N Dron objects (ids 1..N)
+        - 'start_hub: ...'
+          -> parse hub tokens and create a Hub marked as start
+        - 'hub: ...'
+          -> parse hub tokens and create a Hub
+        - 'end_hub: ...'
+          -> parse hub tokens and mark a Hub as end
         - 'connection: name1-name2 [max_link_capacity=...]'
-                                -> create Connection between existing hubs
+          -> create Connection between existing hubs
 
         Returns:
             tuple: (list_drones, list_hub, list_connect)
@@ -149,7 +156,10 @@ class Application:
 
         return list_drones, list_hub, list_connect
 
-    def all_arrived(self, list_drones: List[Dron], list_hubs: List[Hub]) -> bool:
+    def all_arrived(
+            self,
+            list_drones: List[Dron],
+            list_hubs: List[Hub]) -> bool:
         """
         Check whether all drones have reached an end hub.
 
@@ -164,18 +174,28 @@ class Application:
         statuses = [getattr(d.hub, 'end', False) for d in list_drones]
         return all(statuses)
 
-    def run_simulation(self, list_drones: List[Dron],
-                    list_hubs: List[Hub],
-                    list_connect: List[Connection]) -> None:
+    def run_simulation(
+        self,
+        list_drones: List[Dron],
+        list_hubs: List[Hub],
+        list_connect: List[Connection],
+    ) -> None:
         """
-        Main interactive routine that filters blocked connections, computes routes
-        and allows the user to print the simulation in different modes.
+        Main interactive routine that filters blocked connections.
+        Computes routes and allows the user to print the simulation in
+        different modes.
         """
         list_con_limpia: List[Connection] = []
         list_con_blocked: List[Connection] = []
 
         for con in list_connect:
-            if getattr(con.origin, "zone", None) == 'blocked' or getattr(con.destiny, "zone", None) == 'blocked':
+            if getattr(
+                    con.origin,
+                    "zone",
+                    None) == 'blocked' or getattr(
+                    con.destiny,
+                    "zone",
+                    None) == 'blocked':
                 list_con_blocked.append(con)
             else:
                 list_con_limpia.append(con)
@@ -188,7 +208,8 @@ class Application:
         show_capacity_flag = getattr(self.parser, "capacity_info", False)
 
         if self.printer:
-            self.printer.print_by_turns(assigned_drones, show_capacity=show_capacity_flag)
+            self.printer.print_by_turns(
+                assigned_drones, show_capacity=show_capacity_flag)
 
         while True:
             if not self.printer:
@@ -196,24 +217,33 @@ class Application:
                 break
 
             self.printer.print_menu()
-            tecla = input(f"{self.printer._GREEN}> {self.printer._RESET}").strip().lower()
+            tecla = input(
+                f"{self.printer._GREEN}> {self.printer._RESET}"
+            ).strip().lower()
 
             if tecla == '1':
                 os.system('clear')
-                self.printer.print_by_turns(assigned_drones, show_capacity=show_capacity_flag)
+                self.printer.print_by_turns(
+                    assigned_drones, show_capacity=show_capacity_flag)
 
             elif tecla == '2':
                 os.system('clear')
                 self.printer.print_with_animation(assigned_drones, list_hubs)
 
             elif tecla == 'q':
-                print(f"\n{self.printer._GREEN}See you later.{self.printer._RESET}\n")
+                print(
+                    f"\n{self.printer._GREEN}See you later."
+                    f"{self.printer._RESET}\n"
+                )
                 break
 
             else:
-                print(f"{self.printer._RED}Invalid option. Press 1, 2 or q.{self.printer._RESET}")
+                print(
+                    f"{self.printer._RED}Invalid option. Press 1, 2 or q."
+                    f"{self.printer._RESET}"
+                )
 
-    def run(self):
+    def run(self) -> None:
         """
         Entry point for the application module.
         """
