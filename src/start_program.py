@@ -96,6 +96,7 @@ class Application:
         list_hub: List[Hub] = []
         dict_connect: Dict[str, Any] = {}
         list_connect: List[Connection] = []
+        nb: int = 0
 
         with open(args) as file:
             for line in file:
@@ -117,6 +118,8 @@ class Application:
                         for hb in list_hub:
                             dron.hub = hb
                             dron.current_position = hb.hub_name
+                    dict_hub['max_drones'] = nb
+                    dict_hub['zone'] = 'normal'
 
                 elif line.startswith('hub: '):
                     hub_line = line.split(': ', 1)[1].rstrip('\n')
@@ -128,6 +131,8 @@ class Application:
                     hub_line = line.split(': ', 1)[1].rstrip('\n')
                     tokens = hub_line.split(' ', 3)
                     dict_hub = self.return_hub(tokens, 'end')
+                    dict_hub['max_drones'] = nb
+                    dict_hub['zone'] = 'normal'
                     list_hub.append(Hub(**dict_hub))
 
                 elif line.startswith('connection: '):
