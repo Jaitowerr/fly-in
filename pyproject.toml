@@ -8,9 +8,7 @@ authors = [
 license = "Jaitowerr"
 readme = "README.md"
 requires-python = ">3.10"
-dependencies = [
-    "termcolor (>=3.3.0,<4.0.0)"
-]
+dependencies = []
 
 
 [build-system]

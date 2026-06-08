@@ -91,7 +91,7 @@ class Printer:
 
         print(f"\n{self._CYAN}{'═' * 52}{self._RESET}")
         print(
-            f"{self._CYAN}{self._BOLD}  SIMULATION — "
+            f"{self._CYAN}{self._BOLD}          SIMULATION — "
             f"{len(list_drones)} drones — {max_turnos} turns{self._RESET}"
         )
         print(f"{self._CYAN}{'═' * 52}{self._RESET}\n")
@@ -295,8 +295,6 @@ class Printer:
 
         paint(max_turnos)
         print(f"\n{self._CYAN}{'═' * 40}{self._RESET}")
-        print(
-            f"\033[32m{
-                self._BOLD}  Completed in {max_turnos} turns.{
-                self._RESET}")
+        print(f"\033[32m{self._BOLD}  Completed in {max_turnos}"
+              f"turns.{self._RESET}")
         print(f"{self._CYAN}{'═' * 40}{self._RESET}\n")
